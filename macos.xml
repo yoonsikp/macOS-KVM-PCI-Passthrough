@@ -34,23 +34,23 @@
       <target dev='sdb' bus='sata'/>
     </disk>
     <disk type='file' device='disk'>
-      <source file='/rust/storage/hackintosh/fun.raw'/>
+      <source file='/rust/storage/hackintosh/clover.raw'/>
       <target dev='sda' bus='sata'/>
     </disk>
+    
+ <!--
   <hostdev mode='subsystem' type='pci' managed='yes'>
     <source>
       <address domain='0x0000' bus='0x00' slot='0x1f' function='0x06'/>
     </source>
   </hostdev>
+-->
     <input type='tablet' bus='usb'/> 
     <input type='keyboard' bus='usb'/>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 <video>
   <model type='vga' vram='65536'/>
 </video>
-<console type='pty'>
-  <target port='0'/>
-</console>
   </devices>
   <qemu:commandline>
     <qemu:arg value='-readconfig'/>
