@@ -201,19 +201,27 @@ Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), 
 
 Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
-## Booting macOS and cleaning up
+## Booting macOS, Networking, and Cleaning Up
 
-Clover should automatically boot up macOS from now on.
+Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Only set up user accounts, time zone, etc. When configuring the network, it may fail. That is fine.
 
-We can edit macos.xml to remove the following block:
+macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands to fix it:
+```
+virsh domif-setlink macos vnet0 down
+virsh domif-setlink macos vnet0 up
+```
+
+After shutting down the macOS machine safely, we can edit macos.xml to remove the following block:
 ```
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
 ```
-
-Definitely do not login to iCloud/iMessage/iAnything at this point.
+Finally, run:
+```
+sudo virsh define macos.xml
+```
 
 ## Test Networking
 
