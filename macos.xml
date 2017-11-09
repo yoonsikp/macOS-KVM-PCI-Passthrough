@@ -39,7 +39,8 @@
     </disk>
     
     <interface type='network'>
-     <source network='default'/>
+      <source network='default'/>
+      <model type='e1000-82545em'/>
     </interface>
 
   <!--
