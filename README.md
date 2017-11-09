@@ -1,5 +1,5 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10
+A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI on the server.
 
 Preface: I wanted to run macOS on my workstation, since macOS is a more friendly (yet proprietary) OS than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on my ZFS array. I ended up having to use Linux as the host. Not bad, since we don't have to deal with the hardware variety that Hackintosh (c) users must endure.
 
@@ -114,16 +114,117 @@ qemu-img create -f qcow2 macoshd.img 90G
 ```
 (`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the whole line that says `qcow2` in the macos.xml file.)
 
+## Configuring the virtual machine
+
+Download the macos.xml file from the git directory.
+
+Edit the macos.xml to fit your needs
+#### RAM
+`<memory unit='GB'>4</memory>`
+#### CPU Cores
+` <vcpu>2</vcpu>`
+#### Disks and Install Media
+Change all the file paths in the following section to match your system. Make sure to use full paths.
+```
+<controller type='usb' model='ehci'/>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none' io='native'/>
+      <source file='/home/yoonsik/macoshd.img'/>
+      <target dev='sdb' bus='sata'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <source file='/rust/storage/hackintosh/10.13.1.img'/>
+      <target dev='sdc' bus='sata'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <source file='/rust/storage/hackintosh/clover.raw'/>
+      <target dev='sda' bus='sata'/>
+    </disk>
+```
+Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
+
+Later, we will delete the lines for the 10.13.1.img install media. 
+
+Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
+#### VNC
+`<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
+For those who are doing this outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+
 ## Configuring libvirt
 First add yourself as a user of libvirt:
 ```
 sudo usermod -a -G libvirt username_here
 ```
-Libvirt can accept the configurations of virtual machines using xml fiiles.
+Libvirt can accept the configurations of virtual machines using xml files.
 
-Download the macos.xml file from the git directory.
+```
+sudo virsh define macos.xml
+```
+Next, we need to disable AppArmor, since it didn't seem to work with it enabled.
+```
+sudo nano /etc/libvirt/qemu.conf
+```
+Find the line `# security_driver = [...]`, uncomment it, and change it to `security_driver = "none"`.
 
-Edit the macos.xml.
-#### RAM
-`<memory unit='GB'>4</memory>`
+
+## Connecting to the virtual machine
+Start the virtual machine:
+```
+sudo virsh start macos
+```
+
+Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) and connect to the server.
+
+Quickly press F2 (fn+F2 on Mac) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
+
+```
+sudo virsh destroy macos
+```
+(Try not to use this after having booted into your installation of macOS, use the Shutdown inside the VM)
+
+It's important now to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. 
+
+In the setup go to `Device Manager -> OVMF Platform Configuration -> Change Preferred` and select `1024x768`.
+Hit `ESC`, `Y`, `ESC`. Finally, you must select `Reset`, or else the settings will not be applied to the next boot. 
+
+## Installing macOS
+
+Once the Clover bootloader is displayed, hit enter on the Install image.
+The Installer will take several minutes to boot up, and will look frozen most of the time.
+I would say give it at least 15 minutes before giving up.
+
+Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
+Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
+
+Quit Disk Utility and install macOS on Macintosh HD.
+
+
+## Troubleshooting
+
+A reminder that Clover frequently freezes, so you should always edit the config.plist file instead.
+
+If your macOS install is hanging on boot:
+In the config.plist change
+```
+<key>Boot</key>
+	<dict>
+		<key>Arguments</key>
+		<string></string>
+```
+to
+```
+<key>Boot</key>
+	<dict>
+		<key>Arguments</key>
+		<string>-v -s</string>
+```
+Delete clover.raw and recreate the bootloader
+`sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg config.plist`
+
+If your mouse/keyboard isn't working:
+Change <controller type='usb' model='ehci'/> to <controller type='usb' model='piix4-usb-uhci'/>
+
+If only your mouse isn't working:
+Use <input type='mouse' bus='usb'/> instead of <input type='tablet' bus='usb'/> 
+
 
