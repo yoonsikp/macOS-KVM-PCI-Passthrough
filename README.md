@@ -34,7 +34,8 @@ First we need to install qemu (the emulator), libvirt (the VM daemon), virtinst 
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 We also need to install `libguestfs-tools` in order to create a Clover bootloader.
-```sudo apt install libguestfs-tools
+```
+sudo apt install libguestfs-tools
 ```
 
 
