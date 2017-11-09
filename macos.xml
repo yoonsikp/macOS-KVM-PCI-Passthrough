@@ -38,6 +38,12 @@
       <target dev='sda' bus='sata'/>
     </disk>
     
+     <!--
+    <interface type='network'>
+     <source network='default'/>
+  </interface>
+-->
+    
  <!--
   <hostdev mode='subsystem' type='pci' managed='yes'>
     <source>
@@ -45,6 +51,7 @@
     </source>
   </hostdev>
 -->
+    
     <input type='tablet' bus='usb'/> 
     <input type='keyboard' bus='usb'/>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
