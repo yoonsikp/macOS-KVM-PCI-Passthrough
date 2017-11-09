@@ -38,19 +38,17 @@
       <target dev='sda' bus='sata'/>
     </disk>
     
-     <!--
     <interface type='network'>
      <source network='default'/>
-  </interface>
--->
-    
- <!--
-  <hostdev mode='subsystem' type='pci' managed='yes'>
-    <source>
-      <address domain='0x0000' bus='0x00' slot='0x1f' function='0x06'/>
-    </source>
-  </hostdev>
--->
+    </interface>
+
+  <!--
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x06'/>
+      </source>
+    </hostdev>
+  -->
     
     <input type='tablet' bus='usb'/> 
     <input type='keyboard' bus='usb'/>
