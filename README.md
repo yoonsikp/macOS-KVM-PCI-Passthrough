@@ -176,7 +176,7 @@ Start the virtual machine:
 sudo virsh start macos
 ```
 
-Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) and connect to the server.
+Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
 Quickly press F2 (fn+F2 on Mac) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
 
@@ -201,17 +201,19 @@ Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), 
 
 Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
-## Booting macOS, Networking, and Cleaning Up
+## Booting macOS and Networking (Important)
 
-Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Only set up user accounts, time zone, etc. When configuring the network, it may fail. That is fine.
+Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may fuck things up. Only set up user accounts, time zone, etc. While configuring the network, it may fail. That is fine. 
 
-macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands to fix it:
+Once completed, we can fix the networking. macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands in Ubuntu Server to fix it (on every boot!):
 ```
-virsh domif-setlink macos vnet0 down
-virsh domif-setlink macos vnet0 up
+sudo virsh domif-setlink macos vnet0 down
+sudo virsh domif-setlink macos vnet0 up
 ```
 
-After shutting down the macOS machine safely, we can edit macos.xml to remove the following block:
+## Cleaning Up 
+
+After shutting down the macOS machine safely, we can edit macos.xml to remove the following block to get rid of the installation media:
 ```
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
@@ -223,16 +225,59 @@ Finally, run:
 sudo virsh define macos.xml
 ```
 
-## Test Networking
+## iCloud/iMessage
+Using your mac , Download Clover Configurator , and open the config.plist from your server.
+Edit it using the following methods
+http://www.fitzweekly.com/2016/02/hackintosh-imessage-tutorial.html
 
-Most of the time, going to 
+Copy the file back to your server.
+Edit the file and add -s
+
+In the config.plist change
+```
+<key>Boot</key>
+	<dict>
+		<key>Arguments</key>
+		<string></string>
+```
+to
+```
+<key>Boot</key>
+	<dict>
+		<key>Arguments</key>
+		<string>-v -s</string>
+```
+
+At the prompt, type nvram -c, then halt.
+
+
 
 ## PCI-Passthrough for Networking
+The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :)
 
-delete library en0
 
-## iCloud/iMessage
+Delete the block
 
+<interface>
+	
+Then, delete library preferences en0
+Reboot.
+
+
+## PCI-Passthrough for Graphics Card
+
+TBD
+
+
+## Autostart the VM
+Enable autostart
+```
+sudo virsh autostart macos
+```
+Disable autostart
+```
+sudo virsh autostart macos --disable
+```
 ## Troubleshooting
 
 A reminder that Clover frequently freezes, so you should always edit the config.plist file instead.
@@ -260,5 +305,10 @@ Change <controller type='usb' model='ehci'/> to <controller type='usb' model='pi
 
 If only your mouse isn't working:
 Use <input type='mouse' bus='usb'/> instead of <input type='tablet' bus='usb'/> 
+
+If you ever need to delete your VM:
+Type `sudo virsh undefine --nvram macos`. Keep in mind if you add it back, you must go through the process of changing the resolution in the UEFI again.
+
+
 
 
