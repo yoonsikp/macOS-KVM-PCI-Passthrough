@@ -34,24 +34,29 @@ First we need to install qemu (the emulator), libvirt (the VM daemon), virtinst 
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 We also need to install `libguestfs-tools` in order to create a Clover bootloader.
-```sudo apt install libguestfs-tools```
+```sudo apt install libguestfs-tools
+```
 
 
 We will download the script for making the bootloader:
-`wget https://www.kraxel.org/cgit/imagefish/tree/scripts/clover-image.sh`
+```wget https://www.kraxel.org/cgit/imagefish/tree/scripts/clover-image.sh
+```
 Open the file for editing:
-```nano clover-image.sh```
+```nano clover-image.sh
+```
 Change in the first line `/bin/sh` to `/bin/bash` (might be fixed in future)
 
 Now download the Clover Bootloader iso from the following webpage:
 https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
 
-```tar --lzma -xvf CloverISO-4289.tar.lzma```
+```tar --lzma -xvf CloverISO-4289.tar.lzma
+```
 
 Lastly, download the config.plist from the git directory:
 
 
-```sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img fun.raw --cfg config.plist.stripped.qemu```
+```sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img fun.raw --cfg config.plist.stripped.qemu
+```
 
 
 
