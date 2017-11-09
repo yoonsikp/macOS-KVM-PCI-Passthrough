@@ -28,7 +28,7 @@ There is poor support in macOS for Intel I210
 -Graphics Card
 Self Explanatory
 
-##Creating the install image
+## Creating the install image
 Let's begin with the step that requires a Mac.
 Download the High Sierra install from the App Store.
 Click here to create the boot image: https://support.apple.com/en-us/HT201372
@@ -41,13 +41,13 @@ sudo dd if=/dev/disk3 of=~/10.13.1.img bs=1m
 Copy over the `.img` file to your Ubuntu Server.
 
 
-##Installing QEMU
+## Installing QEMU
 First we need to install qemu (the emulator), libvirt (the VM daemon), virtinst (the manager) on Ubuntu:
 ```sudo apt install qemu 
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 
-##Creating the Bootloader
+## Creating the Bootloader
 We also need to install `libguestfs-tools` in order to create a Clover bootloader.
 ```
 sudo apt install libguestfs-tools
@@ -86,7 +86,7 @@ sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg co
 This results in a file called `clover.raw` being created in your current directory.
 
 
-##Configuring UEFI (OVMF)
+## Configuring UEFI (OVMF)
 
 
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
@@ -112,7 +112,7 @@ qemu-img create -f qcow2 macoshd.img 90G
 ```
 
 
-##Configuring libvirt
+## Configuring libvirt
 First add yourself as a user of libvirt:
 ```
 sudo usermod -a -G libvirt username_here
