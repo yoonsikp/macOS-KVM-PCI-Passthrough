@@ -7,7 +7,7 @@ Virtualization technology has changed since I first learned about. The two bigge
 
 You will need a Mac in order to download and create the install image.
 
-
+## Prerequisites
 My system: 
 ```
 Motherboard: AsRock Rack C236M WS
@@ -20,6 +20,8 @@ SSD: Samsung SM951 NVMe
 HDD: 2 x WD Red 3TB
 OS: Ubuntu Server 17.10
 ```
+You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites
+
 There are two PCIe devices I wish to passthrough:
 
 -Intel I219-LM (Ethernet)
@@ -102,15 +104,15 @@ cd /
 rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
 ```
 
-##Creating a virtual disk for installation
+## Creating a virtual disk for installation
 
-We need to use qemu-img to create a disk file to install macOS to. Change 90G, to however big or small you like.
+We need to use qemu-img to create a disk file to install macOS to. Change 90G, to however big or small you want your virtual machine's drive size to be.
 
 ```
 cd /where/you/want/the/disk/to/be
 qemu-img create -f qcow2 macoshd.img 90G
 ```
-
+(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the whole line that says `qcow2` in the macos.xml file.)
 
 ## Configuring libvirt
 First add yourself as a user of libvirt:
@@ -119,7 +121,9 @@ sudo usermod -a -G libvirt username_here
 ```
 Libvirt can accept the configurations of virtual machines using xml fiiles.
 
-Download the xml file from the git directory:
+Download the macos.xml file from the git directory.
 
-
+Edit the macos.xml.
+#### RAM
+`<memory unit='GB'>4</memory>`
 
