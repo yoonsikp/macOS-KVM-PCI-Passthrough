@@ -1,44 +1,46 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI on the server.
+A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI/desktop on the server.
 
-Preface: I wanted to run macOS on my workstation, since macOS is a more friendly (yet proprietary) OS than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on my ZFS array. I ended up having to use Linux as the host. Not bad, since we don't have to deal with the hardware variety that Hackintosh (c) users must endure.
+Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS (although proprietary) than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. This means we also don't have to deal with the problems that Hackintosh users must endure.
 
-Virtualization technology has changed since I first learned about. The two biggest new features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* passing of the PCI device to the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc. 
-
-You will need a Mac in order to download and create the install image.
+Virtualization technology has been revolutionized in the past few years. The two biggest new features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed.
 
 ## Prerequisites
-My system: 
+You will need a Mac in order to download and create the install image.
+
+You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites
+
+#### My system: 
 ```
 Motherboard: AsRock Rack C236M WS
 Chipset: C236
 RAM: 8GB Crucial ECC
 CPU: i3-6100
 GPU: Intel HD 530 & TBA
-Ethernet: Intel I210 and I219-LM
+Ethernet: Intel I210 and Intel I219-LM
 SSD: Samsung SM951 NVMe
 HDD: 2 x WD Red 3TB
 OS: Ubuntu Server 17.10
 ```
-You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites
 
 There are two PCIe devices I wish to passthrough:
 
--Intel I219-LM (Ethernet)
-There is poor support in macOS for Intel I210
+-Ethernet (Intel I219-LM)
+There is poor support in macOS for Intel I210, so I chose the other ethernet port
 
--Graphics Card
-Self Explanatory
+-Graphics Card (TBA)
+Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop
+
 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
 Download the High Sierra install from the App Store.
-Click here to create the boot image: https://support.apple.com/en-us/HT201372
+Click here to help create the boot image on a USB Drive: https://support.apple.com/en-us/HT201372
 
-Now we need to convert that back into an `.img` file.
-Type `diskutil list` to find out the name of your flash drive, and replace it in the following:
+Now we need to convert the USB Drive back into an `.img` file.
+Type `diskutil list` to find out the name of your flash drive, and replace it in the following command:
 ```
-sudo dd if=/dev/disk3 of=~/10.13.1.img bs=1m
+sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.13.1.img
 ```
 Copy over the `.img` file to your Ubuntu Server.
 
@@ -146,6 +148,7 @@ Note that the Clover bootloader occupies the `sda` slot, i.e the first boot devi
 Later, we will delete the lines for the 10.13.1.img install media. 
 
 Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
+
 #### VNC
 `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
 For those who are doing this outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
@@ -182,7 +185,7 @@ sudo virsh destroy macos
 ```
 (Try not to use this after having booted into your installation of macOS, use the Shutdown inside the VM)
 
-It's important now to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. 
+It's important to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. 
 
 In the setup go to `Device Manager -> OVMF Platform Configuration -> Change Preferred` and select `1024x768`.
 Hit `ESC`, `Y`, `ESC`. Finally, you must select `Reset`, or else the settings will not be applied to the next boot. 
@@ -196,8 +199,31 @@ I would say give it at least 15 minutes before giving up.
 Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
 Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
 
-Quit Disk Utility and install macOS on Macintosh HD.
+Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
+## Booting macOS and cleaning up
+
+Clover should automatically boot up macOS from now on.
+
+We can edit macos.xml to remove the following block:
+```
+    <disk type='file' device='disk'>
+      <source file='/rust/storage/hackintosh/10.13.1.img'/>
+      <target dev='sdc' bus='sata'/>
+    </disk>
+```
+
+Definitely do not login to iCloud/iMessage/iAnything at this point.
+
+## Test Networking
+
+Most of the time, going to 
+
+## PCI-Passthrough for Networking
+
+delete library en0
+
+## iCloud/iMessage
 
 ## Troubleshooting
 
