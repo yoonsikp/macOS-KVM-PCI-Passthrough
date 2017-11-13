@@ -1,7 +1,7 @@
 <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
   <name>macos</name>
   <uuid>f5b8c05b-9c7a-3211-49b9-2bd635f7e3aa</uuid>
-  <memory unit='GB'>4</memory>
+  <memory unit='GB'>5</memory>
   <cpu mode='custom' match='exact' check='partial'>
     <model vendor_id='GenuineIntel'>Penryn</model>
     <feature policy='require' name='invtsc'/>
