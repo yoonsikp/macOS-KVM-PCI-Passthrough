@@ -25,6 +25,10 @@
     <emulator>/usr/bin/kvm</emulator>
     <controller type='usb' model='ehci'/>
     <disk type='file' device='disk'>
+      <source file='/rust/storage/hackintosh/clover.raw'/>
+      <target dev='sda' bus='sata'/>
+    </disk>
+    <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='native'/>
       <source file='/home/yoonsik/macoshd.img'/>
       <target dev='sdb' bus='sata'/>
@@ -32,10 +36,6 @@
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
-    </disk>
-    <disk type='file' device='disk'>
-      <source file='/rust/storage/hackintosh/clover.raw'/>
-      <target dev='sda' bus='sata'/>
     </disk>
     
     <interface type='network'>
