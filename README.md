@@ -130,7 +130,10 @@ Edit the macos.xml to fit your needs
 #### Disks and Install Media
 Change all the file paths in the following section to match your system. Make sure to use full paths.
 ```
-<controller type='usb' model='ehci'/>
+    <disk type='file' device='disk'>
+      <source file='/rust/storage/hackintosh/clover.raw'/>
+      <target dev='sda' bus='sata'/>
+    </disk>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='native'/>
       <source file='/home/yoonsik/macoshd.img'/>
@@ -139,10 +142,6 @@ Change all the file paths in the following section to match your system. Make su
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
-    </disk>
-    <disk type='file' device='disk'>
-      <source file='/rust/storage/hackintosh/clover.raw'/>
-      <target dev='sda' bus='sata'/>
     </disk>
 ```
 Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
