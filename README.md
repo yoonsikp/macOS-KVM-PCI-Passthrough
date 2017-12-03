@@ -202,9 +202,9 @@ Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), 
 
 Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
-## Booting macOS and Networking (Important)
+## Setting Up macOS for the first time and Networking (Important!)
 
-Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may fuck things up. Only set up user accounts, time zone, etc. While configuring the network, it may fail. That is fine. 
+Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may break things. Only set up user accounts, time zone, etc. While configuring the network, it may fail. That is fine. 
 
 Once completed, we can fix the networking. macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands in Ubuntu Server to fix it (on every boot!):
 ```
