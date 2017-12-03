@@ -1,12 +1,13 @@
 # macos-kvm-pci-passthrough
 A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI/desktop on the server.
 
-Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS (although proprietary) than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. This means we also don't have to deal with the problems that Hackintosh users must endure.
+Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS (although proprietary) than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we also don't have to deal with the problems that Hackintosh users must endure.
 
-Virtualization technology has been revolutionized in the past few years. The two biggest new features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed.
+Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, this features allows you to pass through ethernet cards and USB controllers.
 
 ## Prerequisites
 You will need a Mac in order to download and create the install image.
+You should probably also use the Mac if you are using Clover configurator.
 
 You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites
 
@@ -14,28 +15,29 @@ You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.or
 ```
 Motherboard: AsRock Rack C236M WS
 Chipset: C236
-RAM: 8GB Crucial ECC
+RAM: 8GB Crucial ECC @ 2133MHz
 CPU: i3-6100
-GPU: Intel HD 530 & TBA
+GPU: Intel HD 530 & AMD Radeon RX 560
 Ethernet: Intel I210 and Intel I219-LM
 SSD: Samsung SM951 NVMe
 HDD: 2 x WD Red 3TB
-OS: Ubuntu Server 17.10
+Host OS: Ubuntu Server 17.10
 ```
 
 There are two PCIe devices I wish to passthrough:
 
 -Ethernet (Intel I219-LM)
-There is poor support in macOS for Intel I210, so I chose the other ethernet port
+There is poor support in macOS/Hackintosh community for the Intel I210, so I chose the other ethernet port. The I210 will be used for Ubuntu
 
--Graphics Card (TBA)
-Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop
+-Graphics Card (AMD Radeon RX 560)
+Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of box in macOS.
 
 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
 Download the High Sierra install from the App Store.
 Click here to help create the boot image on a USB Drive: https://support.apple.com/en-us/HT201372
+Use an 8GB flash drive if possible, since the install image we create will be the size of your flash drive.
 
 Now we need to convert the USB Drive back into an `.img` file.
 Type `diskutil list` to find out the name of your flash drive, and replace it in the following command:
@@ -151,7 +153,7 @@ Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'
 
 #### VNC
 `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
-For those who are doing this outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
 
 ## Configuring libvirt
 First add yourself as a user of libvirt:
@@ -163,7 +165,7 @@ Libvirt can accept the configurations of virtual machines using xml files.
 ```
 sudo virsh define macos.xml
 ```
-Next, we need to disable AppArmor, since it didn't seem to work with it enabled.
+Next, we need to disable AppArmor, since it didn't seem to work with it enabled. (this may be a security hole ...)
 ```
 sudo nano /etc/libvirt/qemu.conf
 ```
@@ -253,6 +255,8 @@ At the prompt, type nvram -c, then halt.
 
 
 ## PCI-Passthrough for Networking
+TBD
+
 The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :)
 
 
@@ -280,7 +284,7 @@ sudo update-initramfs -u
 
 Delete the block
 
-<interface>
+```<interface>```
 	
 Then, delete library preferences en0
 Reboot.
