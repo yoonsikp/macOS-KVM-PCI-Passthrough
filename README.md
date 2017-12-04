@@ -301,7 +301,26 @@ Reboot.
 ## PCI-Passthrough for Graphics Card
 
 TBD
+```
+sudo nano /etc/initramfs-tools/modules 
+```
+```
+vfio
+vfio_iommu_type1
+vfio_virqfd
+vfio_pci ids=8086:15b7,8086:1901,1002:67ff,1002:aae0 disable_vga=1
+```
 
+```
+sudo nano /etc/modprobe.d/amdgpu.conf
+```
+```
+blacklist amdgpu
+```
+```
+sudo depmod -ae
+sudo update-initramfs -u
+```
 
 ## Autostart the VM
 Enable autostart
