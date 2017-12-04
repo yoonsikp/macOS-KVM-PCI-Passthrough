@@ -42,8 +42,30 @@
       <source network='default'/>
       <model type='e1000-82545em'/>
     </interface>
+    
+    <!--
 
+    <controller type='usb' model='ehci'/>
+
+    <hostdev mode='subsystem' type='usb'>
+      <source startupPolicy='mandatory'>
+      <vendor id ='0x192f'/>
+      <product id='0x0416'/>
+      </source>
+    </hostdev>
+    -->
+    
   <!--
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x14' function='0x00'/>
+      </source>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x14' function='0x02'/>
+      </source>
+    </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
         <address domain='0x0000' bus='0x00' slot='0x1f' function='0x06'/>
@@ -53,6 +75,7 @@
     
     <input type='tablet' bus='usb'/> 
     <input type='keyboard' bus='usb'/>
+    
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 <video>
   <model type='vga' vram='65536'/>
