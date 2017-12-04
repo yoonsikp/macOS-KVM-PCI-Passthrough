@@ -54,11 +54,14 @@ sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 
 ## Enabling Passthrough
-```sudo nano /etc/default/grub
 ```
-```GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
+sudo nano /etc/default/grub
 ```
-```sudo update-grub  
+```
+GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
+```
+```
+sudo update-grub  
 ```
 
 ## Creating the Bootloader
