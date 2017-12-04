@@ -275,8 +275,8 @@ sudo nano /etc/initramfs-tools/modules
 ```
 vfio
 vfio_iommu_type1
-vfio_pci ids=8086:1533
 vfio_virqfd
+vfio_pci ids=8086:1533
 ```
 
 ```
