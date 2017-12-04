@@ -212,7 +212,7 @@ sudo virsh domif-setlink macos vnet0 down
 sudo virsh domif-setlink macos vnet0 up
 ```
 
-## Cleaning Up 
+## Cleaning Up / Modifying the macos.xml configuration file
 
 After shutting down the macOS machine safely, we can edit macos.xml to remove the following block to get rid of the installation media:
 ```
