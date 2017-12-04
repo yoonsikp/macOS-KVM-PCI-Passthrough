@@ -276,17 +276,9 @@ sudo nano /etc/initramfs-tools/modules
 vfio
 vfio_iommu_type1
 vfio_virqfd
-vfio_pci ids=8086:1533
+vfio_pci ids=8086:1533 disable_vga=1
 ```
 
-```
-sudo nano /etc/modprobe.d/local.conf
-```
-```
-options vfio-pci ids=8086:1533
-options vfio-pci disable_vga=1
-```
-(stops anything attached to vfio-pci from acting as a vga to linux)"
 ```
 sudo nano /etc/modprobe.d/e1000e.conf
 ```
