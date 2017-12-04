@@ -83,6 +83,6 @@
   </devices>
   <qemu:commandline>
     <qemu:arg value='-readconfig'/>
-    <qemu:arg value='/home/yoonsik/macintosh.cfg'/>
+    <qemu:arg value='/home/yoonsik/osk.cfg'/>
   </qemu:commandline>
 </domain>
