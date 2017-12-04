@@ -258,28 +258,34 @@ TBD
 
 The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :)
 
-
+```
 sudo nano /etc/initramfs-tools/modules 
-
+```
+```
 vfio
 vfio_iommu_type1
 vfio_pci ids=8086:1533
 vfio_virqfd
+```
 
-
-
+```
 sudo nano /etc/modprobe.d/local.conf
-
+```
+```
 options vfio-pci ids=8086:1533
 options vfio-pci disable_vga=1
+```
 (stops anything attached to vfio-pci from acting as a vga to linux)"
-
+```
 sudo nano /etc/modprobe.d/e1000e.conf
+```
+```
 blacklist e1000e
-
+```
+```
 sudo depmod -ae
 sudo update-initramfs -u
-
+```
 
 Delete the block
 
