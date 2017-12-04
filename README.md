@@ -293,7 +293,7 @@ sudo update-initramfs -u
 Delete the block
 
 ```<interface>```
-	
+Use kextbeast to install the MausiEthernet.kext
 Then, delete library preferences en0
 Reboot.
 
