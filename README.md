@@ -1,6 +1,8 @@
 # macos-kvm-pci-passthrough
 A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI/desktop on the server.
 
+Warning: After using it for about two weeks, I realize there are bugs that are quite annoying, and I cannot recommend the following as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchrnoization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, for example building Xcode projects. So I recommend the following tutorial to those who want to run a macOS VM.
+
 Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS (although proprietary) than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we also don't have to deal with the problems that Hackintosh users must endure.
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, this features allows you to pass through ethernet cards and USB controllers.
