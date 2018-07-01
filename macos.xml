@@ -73,6 +73,23 @@
     </hostdev>
   -->
     
+  <!--
+    If you want to place a PCI device at a specific location on the virtualized machine, use
+the following method:
+  <hostdev mode="subsystem" type="pci" managed="yes">
+    <source>
+      <address domain="0x0000" bus="0x01" slot="0x00" function="0x00"/>
+    </source>
+    <address type="pci" domain="0x0000" bus="0x04" slot="0x00" function="0x0" multifunction="on"/>
+      <rom bar='on' file='/home/yoonsik/vbios.dmp'/>
+  </hostdev>
+  <hostdev mode="subsystem" type="pci" managed="yes">
+    <source>
+      <address domain="0x0000" bus="0x01" slot="0x00" function="0x01"/>
+    </source>
+    <address type="pci" domain="0x0000" bus="0x04" slot="0x00" function="0x1"/>
+  </hostdev>
+     -->
     <input type='tablet' bus='usb'/> 
     <input type='keyboard' bus='usb'/>
     
