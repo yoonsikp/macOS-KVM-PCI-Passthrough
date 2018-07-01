@@ -7,6 +7,9 @@ Preface: I wanted to run macOS on my workstation, since macOS is a more friendly
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, this features allows you to pass through ethernet cards and USB controllers.
 
+## Don't Forget
+Don't forget to edit osk.cfg to change the secret key. I can't post it on Github for legal reasons.
+
 ## Prerequisites
 You will need a Mac in order to download and create the install image.
 You should probably also use the Mac if you are using Clover configurator.
