@@ -31,10 +31,10 @@ Host OS: Ubuntu Server 17.10
 
 There are two PCIe devices I wish to passthrough:
 
--Ethernet (Intel I219-LM)
+- Ethernet (Intel I219-LM)
 There is poor support in macOS for the Intel I210, so I chose the Intel I219-LM. The I210 will be used for the host.
 
--Graphics Card (AMD Radeon RX 560)
+- Graphics Card (AMD Radeon RX 560)
 Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of the box in macOS 10.13.
 
 
