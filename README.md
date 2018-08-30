@@ -311,7 +311,8 @@ Lastly, start the VM. If any network interface names are numbered oddly on the m
 
 ## PCI-Passthrough for Graphics Card
 
-Same as above, except we need to attach the `vfio_pci` driver to multiple PCI-e addresses.
+Same as above, except we need to attach the `vfio_pci` driver to multiple PCI-e addresses. Below, I also passthrough my entire USB 3.0 controller! 
+
 ```
 sudo nano /etc/initramfs-tools/modules 
 ```
@@ -319,7 +320,7 @@ sudo nano /etc/initramfs-tools/modules
 vfio
 vfio_iommu_type1
 vfio_virqfd
-vfio_pci ids=8086:15b7,8086:1901,1002:67ff,1002:aae0 disable_vga=1
+vfio_pci ids=8086:15b7,8086:a12f,1002:67ff,1002:aae0 disable_vga=1
 ```
 
 ```
@@ -334,6 +335,7 @@ sudo update-initramfs -u
 ```
 For the graphics card definition, check the commented-out block in `macos.xml`.
 
+Note, you cannot passthrough a `PCI bridge` to a VM.
 ## Autostart the VM
 Enable autostart
 ```
