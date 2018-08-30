@@ -1,22 +1,22 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10, without needing to start a GUI/desktop on the server.
+A guide to macOS virtualization on Ubuntu Server 17.10, done completely through the command line. (No need to start a GUI/desktop on the server)
 
-Warning: After using it for about two weeks, I realize there are bugs that are quite annoying, and I cannot recommend the following as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchrnoization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, for example building Xcode projects. So I recommend the following tutorial to those who want to run a macOS VM, but do not necessarily want to use it is a daily driver.
+Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
-Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS (although proprietary) than Linux. However, I still wanted to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we also don't have to deal with the problems that Hackintosh users must endure.
+Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS than Linux. However, I still needed to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we also don't have to deal with the problems that Hackintosh users must endure.
 
-Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, this features allows you to pass through ethernet cards and USB controllers.
+Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
 
 ## Don't Forget
-Don't forget to edit osk.cfg to change the secret key. I can't post it on Github for legal reasons.
+Don't forget to edit `osk.cfg` and add the secret key. I can't post it on Github for legal reasons.
 
 ## Prerequisites
-You will need a Mac in order to download and create the install image.
-You should probably also use the Mac if you are using Clover configurator.
+You will need a Mac in order to download and create an install image.
+You should also use a Mac if you are using Clover Configurator to edit the Clover config.
 
 You need a CPU that supports both KVM and IOMMU. Check https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites
 
-#### My system: 
+#### My System: 
 ```
 Motherboard: AsRock Rack C236M WS
 Chipset: C236
@@ -32,55 +32,57 @@ Host OS: Ubuntu Server 17.10
 There are two PCIe devices I wish to passthrough:
 
 -Ethernet (Intel I219-LM)
-There is poor support in macOS/Hackintosh community for the Intel I210, so I chose the other ethernet port. The I210 will be used for Ubuntu
+There is poor support in macOS for the Intel I210, so I chose the Intel I219-LM. The I210 will be used for the host.
 
 -Graphics Card (AMD Radeon RX 560)
-Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of box in macOS.
+Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of the box in macOS 10.13.
 
 
 ## Creating the install image
-Let's begin with the step that requires a Mac.
-Download the High Sierra install from the App Store.
-Click here to help create the boot image on a USB Drive: https://support.apple.com/en-us/HT201372
-Use an 8GB flash drive if possible, since the install image we create will be the size of your flash drive.
+Let's begin with the step that requires a Mac. Download the High Sierra installer from the App Store.
+Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372
+Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.
 
-Now we need to convert the USB Drive back into an `.img` file.
-Type `diskutil list` to find out the name of your flash drive, and replace it in the following command:
+We need to convert the bootable USB Drive back into an `.img` file.
+Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
 ```
 sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.13.1.img
 ```
-Copy over the `.img` file to your Ubuntu Server.
-
+Copy the bootable `.img` file to your Ubuntu Server.
 
 ## Installing QEMU
-First we need to install qemu (the emulator), libvirt (the VM daemon), virtinst (the manager) on Ubuntu:
+Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on Ubuntu:
 ```sudo apt install qemu 
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 
-## Enabling Passthrough
+## Enabling Kernel Support for Passthrough
+These are the kernel flags:
+`intel_iommu=on` allows PCIe passthrough
+`iommu=pt` speeds up the PCIe passthrough (optional, remove if something doesn't work)
 
+Open the grub configuration:
 ```
 sudo nano /etc/default/grub
 ```
+Change the following line:
 ```
 GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
 ```
+Update the host bootloader:
 ```
 sudo update-grub  
 ```
-`intel_iommu=on` allows the PCI-e passthrough
-`iommu=pt` speeds it up, remove this option if something doesn't work
 
-## Creating the Bootloader
-We also need to install `libguestfs-tools` in order to create a Clover bootloader.
+## Creating the macOS Bootloader
+We need to install `libguestfs-tools` in order to create a Clover bootloader.
 ```
 sudo apt install libguestfs-tools
 ```
 
-We will download the script for making the bootloader:
+Download the script for making the bootloader:
 ```
-wget https://www.kraxel.org/cgit/imagefish/tree/scripts/clover-image.sh
+wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
 ```
 Open the file for editing:
 ```
@@ -96,7 +98,7 @@ Extract it
 tar --lzma -xvf CloverISO-4289.tar.lzma
 ```
 
-Lastly, download the config.plist required by Clover from the git root directory:
+Lastly, download `config.plist`, required by Clover, from my repository:
 
 ```
 wget https://raw.githubusercontent.com/yoonsikp/macos-kvm-pci-passthrough/master/config.plist
@@ -110,16 +112,14 @@ sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg co
 ```
 This results in a file called `clover.raw` being created in your current directory.
 
-
 ## Configuring UEFI (OVMF)
-
 
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
 Download the .rpm file that contains `*ovmf-x64*` from the following page:
 https://www.kraxel.org/repos/jenkins/edk2/
 
-Install rpm2cpio and extract it to your root directory:
+Install `rpm2cpio` and extract the UEFI firmware to your root directory:
 
 ```
 sudo apt install rpm2cpio
@@ -129,19 +129,19 @@ rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa
 
 ## Creating a virtual disk for installation
 
-We need to use qemu-img to create a disk file to install macOS to. Change 90G, to however big or small you want your virtual machine's drive size to be.
+We need to use `qemu-img` to create a virtual disk to install macOS to. Change 90G, to however big or small you want your virtual machine's drive size to be.
 
 ```
 cd /where/you/want/the/disk/to/be
 qemu-img create -f qcow2 macoshd.img 90G
 ```
-(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the whole line that says `qcow2` in the macos.xml file.)
+(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the entire line that says `qcow2` in the macos.xml file.)
 
 ## Configuring the virtual machine
 
-Download the macos.xml file from the git directory.
+Download the `macos.xml` file from the git directory. This file defines the virtual machine.
 
-Edit the macos.xml to fit your needs
+Edit the `macos.xml` to fit your needs
 #### RAM
 `<memory unit='GB'>4</memory>`
 #### CPU Cores
@@ -179,11 +179,10 @@ First add yourself as a user of libvirt:
 sudo usermod -a -G libvirt username_here
 ```
 Libvirt can accept the configurations of virtual machines using xml files.
-
 ```
 sudo virsh define macos.xml
 ```
-Next, we need to disable AppArmor, since it didn't seem to work with it enabled. (this may be a security hole ...)
+Next, we need to disable AppArmor, since it didn't seem to work with it enabled. (Warning, this may be insecure ...)
 ```
 sudo nano /etc/libvirt/qemu.conf
 ```
@@ -191,11 +190,11 @@ Find the line `# security_driver = [...]`, uncomment it, and change it to `secur
 
 
 ## Connecting to the virtual machine
+
 Start the virtual machine:
 ```
 sudo virsh start macos
 ```
-
 Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
 Quickly press F2 (fn+F2 on Mac) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
@@ -203,12 +202,11 @@ Quickly press F2 (fn+F2 on Mac) to enter the setup screen. If you missed it you 
 ```
 sudo virsh destroy macos
 ```
-(Try not to use this after having booted into your installation of macOS, use the Shutdown inside the VM)
 
 It's important to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. 
 
 In the setup go to `Device Manager -> OVMF Platform Configuration -> Change Preferred` and select `1024x768`.
-Hit `ESC`, `Y`, `ESC`. Finally, you must select `Reset`, or else the settings will not be applied to the next boot. 
+Hit `ESC`, `Y`, `ESC`. Finally, select `Reset`, otherwise the settings will not be applied to the boot. 
 
 ## Installing macOS
 
@@ -246,34 +244,14 @@ sudo virsh define macos.xml
 ```
 
 ## iCloud/iMessage
-Using your mac , Download Clover Configurator , and open the config.plist from your server.
+Using your Mac, download Clover Configurator, and open the config.plist from your host.
 Edit it using the following methods
 http://www.fitzweekly.com/2016/02/hackintosh-imessage-tutorial.html
-
-Copy the file back to your server.
-Edit the file and add -s
-
-In the config.plist change
-```
-<key>Boot</key>
-	<dict>
-		<key>Arguments</key>
-		<string></string>
-```
-to
-```
-<key>Boot</key>
-	<dict>
-		<key>Arguments</key>
-		<string>-v -s</string>
-```
-
-At the prompt, type nvram -c, then halt.
-
-
+Copy the file back to your server. Go to the bottom of this guide and recreate your Clover bootloader.
+Once you start the VM, open a terminal prompt, type `sudo nvram -c`, then `sudo reboot`.
 
 ## PCI-Passthrough for Networking
-The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :).
+The networking bug above annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :).
 
 Follow this section of ensuring the PCI-passthrough groups are valid from ArchWiki: https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Ensuring_that_the_groups_are_valid
 
@@ -281,27 +259,14 @@ After running the script, you should get something like this:
 ```
 IOMMU Group 0 00:00.0 Host bridge [0600]: Intel Corporation Skylake Host Bridge/DRAM Registers [8086:190f] (rev 07)
 IOMMU Group 10 03:00.0 Ethernet controller [0200]: Intel Corporation I210 Gigabit Network Connection [8086:1533] (rev 03)
-IOMMU Group 11 04:00.0 Non-Volatile memory controller [0108]: Samsung Electronics Co Ltd NVMe SSD Controller [144d:a802] (rev 01)
-IOMMU Group 1 00:01.0 PCI bridge [0604]: Intel Corporation Skylake PCIe Controller (x16) [8086:1901] (rev 07)
-IOMMU Group 1 01:00.0 VGA compatible controller [0300]: NVIDIA Corporation GK106 [GeForce GTX 650 Ti] [10de:11c6] (rev a1)
-IOMMU Group 1 01:00.1 Audio device [0403]: NVIDIA Corporation GK106 HDMI Audio Controller [10de:0e0b] (rev a1)
-IOMMU Group 2 00:02.0 Display controller [0380]: Intel Corporation HD Graphics 530 [8086:1912] (rev 06)
-IOMMU Group 3 00:14.0 USB controller [0c03]: Intel Corporation Sunrise Point-H USB 3.0 xHCI Controller [8086:a12f] (rev 31)
-IOMMU Group 3 00:14.2 Signal processing controller [1180]: Intel Corporation Sunrise Point-H Thermal subsystem [8086:a131] (rev 31)
-IOMMU Group 4 00:17.0 SATA controller [0106]: Intel Corporation Sunrise Point-H SATA controller [AHCI mode] [8086:a102] (rev 31)
-IOMMU Group 5 00:1c.0 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #1 [8086:a110] (rev f1)
-IOMMU Group 6 00:1c.7 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #8 [8086:a117] (rev f1)
-IOMMU Group 7 00:1d.0 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #9 [8086:a118] (rev f1)
-IOMMU Group 8 00:1f.0 ISA bridge [0601]: Intel Corporation Sunrise Point-H LPC Controller [8086:a149] (rev 31)
-IOMMU Group 8 00:1f.2 Memory controller [0580]: Intel Corporation Sunrise Point-H PMC [8086:a121] (rev 31)
-IOMMU Group 8 00:1f.3 Audio device [0403]: Intel Corporation Sunrise Point-H HD Audio [8086:a170] (rev 31)
+...
 IOMMU Group 8 00:1f.4 SMBus [0c05]: Intel Corporation Sunrise Point-H SMBus [8086:a123] (rev 31)
 IOMMU Group 9 00:1f.6 Ethernet controller [0200]: Intel Corporation Ethernet Connection (2) I219-LM [8086:15b7] (rev 31)
 ```
 
-I chose to passthrough the I210 ethernet controller, and thankfully there are no other devices in the IOMMU Group.
+I chose to passthrough the I219-LM ethernet controller, and thankfully there are no other devices in IOMMU Group 9.
 
-We need to load a few kernel modules/drivers that will attach to our PCI devices very early on in the boot process. We will modify the kernel image that is loaded into the RAM on bootup. Note that `vfio-pci` is an alias for `vfio_pci`, and that `vfio_pci` depends on `vfio` and `vfio_virqfd`.
+We need to load the kernel modules/drivers that will attach to our PCI devices during the boot process. We will modify the kernel image that is loaded into the RAM on bootup. Note that `vfio-pci` is an alias for `vfio_pci`, and that `vfio_pci` depends on `vfio` and `vfio_virqfd`.
 
 ```
 sudo nano /etc/initramfs-tools/modules 
@@ -310,7 +275,7 @@ sudo nano /etc/initramfs-tools/modules
 vfio
 vfio_iommu_type1
 vfio_virqfd
-vfio_pci ids=8086:1533 disable_vga=1
+vfio_pci ids=8086:15b7 disable_vga=1
 ```
 
 Stop the host (Linux) from loading the ethernet driver. You can find the name of the currently loaded driver by running the command `lspci -v`. The filename should start with the name of the driver you want to blacklist.
@@ -325,12 +290,24 @@ Update your boot image
 sudo depmod -ae
 sudo update-initramfs -u
 ```
-Delete the block
 
-```<interface>```
-Use kextbeast to install the MausiEthernet.kext
-Then, delete library preferences en0
-Reboot.
+Now, within the macOS VM, install KextBeast, and then install the ethernet driver called `MausiEthernet.kext`. Shutdown the VM.
+
+Add the ethernet PCIe device to the `macos.xml` file. You can find the PCIe address of the device by running `lspci -v`. The following is the XML definition: 
+
+```
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x06'/>
+      </source>
+    </hostdev>
+```
+Replace the `<address>` with the proper PCIe device address. Multiple PCIe devices require multiple `<hostdev>` definitions.
+Next, we can delete the whole `<interface type='network'>` block in `macos.xml` and redefine the VM.
+```
+sudo virsh define macos.xml
+```
+Lastly, start the VM. If any network interface names are numbered oddly on the macOS VM, open `/Library/Preferences/SystemConfiguration` in Finder and delete `preferences.plist` and `NetworkInterfaces.plist`. Reboot the VM.
 
 ## PCI-Passthrough for Graphics Card
 
@@ -355,6 +332,7 @@ blacklist amdgpu
 sudo depmod -ae
 sudo update-initramfs -u
 ```
+For the graphics card definition, check the commented-out block in `macos.xml`.
 
 ## Autostart the VM
 Enable autostart
