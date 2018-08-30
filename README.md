@@ -59,6 +59,7 @@ sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
 
 ## Enabling Passthrough
+
 ```
 sudo nano /etc/default/grub
 ```
@@ -68,6 +69,8 @@ GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
 ```
 sudo update-grub  
 ```
+`intel_iommu=on` allows the PCI-e passthrough
+`iommu=pt` speeds it up, remove this option if something doesn't work
 
 ## Creating the Bootloader
 We also need to install `libguestfs-tools` in order to create a Clover bootloader.
@@ -270,9 +273,35 @@ At the prompt, type nvram -c, then halt.
 
 
 ## PCI-Passthrough for Networking
-TBD
+The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :).
 
-The networking bug annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :)
+Follow this section of ensuring the PCI-passthrough groups are valid from ArchWiki: https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Ensuring_that_the_groups_are_valid
+
+After running the script, you should get something like this:
+```
+IOMMU Group 0 00:00.0 Host bridge [0600]: Intel Corporation Skylake Host Bridge/DRAM Registers [8086:190f] (rev 07)
+IOMMU Group 10 03:00.0 Ethernet controller [0200]: Intel Corporation I210 Gigabit Network Connection [8086:1533] (rev 03)
+IOMMU Group 11 04:00.0 Non-Volatile memory controller [0108]: Samsung Electronics Co Ltd NVMe SSD Controller [144d:a802] (rev 01)
+IOMMU Group 1 00:01.0 PCI bridge [0604]: Intel Corporation Skylake PCIe Controller (x16) [8086:1901] (rev 07)
+IOMMU Group 1 01:00.0 VGA compatible controller [0300]: NVIDIA Corporation GK106 [GeForce GTX 650 Ti] [10de:11c6] (rev a1)
+IOMMU Group 1 01:00.1 Audio device [0403]: NVIDIA Corporation GK106 HDMI Audio Controller [10de:0e0b] (rev a1)
+IOMMU Group 2 00:02.0 Display controller [0380]: Intel Corporation HD Graphics 530 [8086:1912] (rev 06)
+IOMMU Group 3 00:14.0 USB controller [0c03]: Intel Corporation Sunrise Point-H USB 3.0 xHCI Controller [8086:a12f] (rev 31)
+IOMMU Group 3 00:14.2 Signal processing controller [1180]: Intel Corporation Sunrise Point-H Thermal subsystem [8086:a131] (rev 31)
+IOMMU Group 4 00:17.0 SATA controller [0106]: Intel Corporation Sunrise Point-H SATA controller [AHCI mode] [8086:a102] (rev 31)
+IOMMU Group 5 00:1c.0 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #1 [8086:a110] (rev f1)
+IOMMU Group 6 00:1c.7 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #8 [8086:a117] (rev f1)
+IOMMU Group 7 00:1d.0 PCI bridge [0604]: Intel Corporation Sunrise Point-H PCI Express Root Port #9 [8086:a118] (rev f1)
+IOMMU Group 8 00:1f.0 ISA bridge [0601]: Intel Corporation Sunrise Point-H LPC Controller [8086:a149] (rev 31)
+IOMMU Group 8 00:1f.2 Memory controller [0580]: Intel Corporation Sunrise Point-H PMC [8086:a121] (rev 31)
+IOMMU Group 8 00:1f.3 Audio device [0403]: Intel Corporation Sunrise Point-H HD Audio [8086:a170] (rev 31)
+IOMMU Group 8 00:1f.4 SMBus [0c05]: Intel Corporation Sunrise Point-H SMBus [8086:a123] (rev 31)
+IOMMU Group 9 00:1f.6 Ethernet controller [0200]: Intel Corporation Ethernet Connection (2) I219-LM [8086:15b7] (rev 31)
+```
+
+I chose to passthrough the I210 ethernet controller, and thankfully there are no other devices in the IOMMU Group.
+
+We need to load a few kernel modules/drivers that will attach to our PCI devices very early on in the boot process. We will modify the kernel image that is loaded into the RAM on bootup. Note that `vfio-pci` is an alias for `vfio_pci`, and that `vfio_pci` depends on `vfio` and `vfio_virqfd`.
 
 ```
 sudo nano /etc/initramfs-tools/modules 
@@ -284,17 +313,18 @@ vfio_virqfd
 vfio_pci ids=8086:1533 disable_vga=1
 ```
 
+Stop the host (Linux) from loading the ethernet driver. You can find the name of the currently loaded driver by running the command `lspci -v`. The filename should start with the name of the driver you want to blacklist.
 ```
 sudo nano /etc/modprobe.d/e1000e.conf
 ```
 ```
 blacklist e1000e
 ```
+Update your boot image
 ```
 sudo depmod -ae
 sudo update-initramfs -u
 ```
-
 Delete the block
 
 ```<interface>```
@@ -302,10 +332,9 @@ Use kextbeast to install the MausiEthernet.kext
 Then, delete library preferences en0
 Reboot.
 
-
 ## PCI-Passthrough for Graphics Card
 
-TBD
+Same as above, except we need to attach the `vfio_pci` driver to multiple PCI-e addresses.
 ```
 sudo nano /etc/initramfs-tools/modules 
 ```
