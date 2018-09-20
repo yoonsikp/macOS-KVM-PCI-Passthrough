@@ -1,5 +1,7 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10, done completely through the command line. (No need to start a GUI/desktop on the server)
+A guide to macOS virtualization on Ubuntu Server 17.10, done completely through the command line, no GUI required.
+
+Please star this guide if it is useful!
 
 Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
