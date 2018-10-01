@@ -383,5 +383,8 @@ If you ever need to delete your VM:
 Type ```sudo virsh undefine --nvram macos```. Keep in mind if you add it back, you must go through the process of changing the resolution in the UEFI again.
 
 
+## Resources
 
+https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
+https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
 
