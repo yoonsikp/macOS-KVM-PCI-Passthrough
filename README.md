@@ -54,8 +54,12 @@ Copy the bootable `.img` file to your Ubuntu Server.
 
 ## Installing QEMU
 Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on Ubuntu:
-```sudo apt install qemu 
+```
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
+```
+For Debian 9:
+``` 
+sudo apt-get install qemu-kvm libvirt-clients virtinst bridge-utils libvirt-daemon
 ```
 
 ## Enabling Kernel Support for Passthrough
