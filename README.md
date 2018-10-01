@@ -197,7 +197,7 @@ Start the virtual machine:
 ```
 sudo virsh start macos
 ```
-Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
+Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) or gvncviewer, and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
 Quickly press F2 (fn+F2 on Mac) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
 
