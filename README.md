@@ -386,5 +386,6 @@ Type ```sudo virsh undefine --nvram macos```. Keep in mind if you add it back, y
 ## Resources
 
 https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
+
 https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
 
