@@ -9,9 +9,6 @@ Preface: I wanted to run macOS on my workstation, since macOS is a more friendly
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
 
-## Don't Forget
-Don't forget to edit `osk.cfg` and add the secret key. I can't post it on Github for legal reasons.
-
 ## Prerequisites
 You will need a Mac in order to download and create an install image.
 You should also use a Mac if you are using Clover Configurator to edit the Clover config.
@@ -122,6 +119,7 @@ This results in a file called `clover.raw` being created in your current directo
 
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
+(Warning, it turns out that newer versions of this file have problems booting macOS...)
 Download the .rpm file that contains `*ovmf-x64*` from the following page:
 https://www.kraxel.org/repos/jenkins/edk2/
 
