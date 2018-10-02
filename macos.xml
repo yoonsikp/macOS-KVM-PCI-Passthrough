@@ -99,7 +99,9 @@ the following method:
 </video>
   </devices>
   <qemu:commandline>
-    <qemu:arg value='-readconfig'/>
-    <qemu:arg value='/home/yoonsik/osk.cfg'/>
+    <qemu:arg value='-device'/>
+    <qemu:arg value='isa-applesmc,osk=ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc'/>
+    <qemu:arg value='-smbios'/>
+    <qemu:arg value='type=2'/>
   </qemu:commandline>
 </domain>
