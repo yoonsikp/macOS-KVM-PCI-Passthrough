@@ -30,7 +30,7 @@
     </disk>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='native'/>
-      <source file='/home/yoonsik/macoshd.img'/>
+      <source file='/home/yoonsik/hd.qcow2'/>
       <target dev='sdb' bus='sata'/>
     </disk>
     <disk type='file' device='disk'>
