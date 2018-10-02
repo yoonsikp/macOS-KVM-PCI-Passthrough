@@ -137,7 +137,7 @@ We need to use `qemu-img` to create a virtual disk to install macOS to. Change 9
 
 ```
 cd /where/you/want/the/disk/to/be
-qemu-img create -f qcow2 macoshd.img 90G
+qemu-img create -f qcow2 hd.qcow2 90G
 ```
 (`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the entire line that says `qcow2` in the macos.xml file.)
 
@@ -159,7 +159,7 @@ Change all the file paths in the following section to match your system. Make su
     </disk>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='native'/>
-      <source file='/home/yoonsik/macoshd.img'/>
+      <source file='/home/yoonsik/hd.qcow2'/>
       <target dev='sdb' bus='sata'/>
     </disk>
     <disk type='file' device='disk'>
