@@ -57,7 +57,7 @@ Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager
 ```
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
-For Debian 9:
+For Debian 9 (DOES NOT WORK):
 ``` 
 sudo apt-get install qemu-kvm libvirt-clients virtinst bridge-utils libvirt-daemon
 ```
