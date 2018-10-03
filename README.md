@@ -182,6 +182,11 @@ Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'
 #### VNC
 `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
 For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+To create a tunnel:
+```
+ssh -L 5900:127.0.0.1:5900 remote_server
+```
+And then point your VNC client towards `localhost`.
 
 ## Configuring libvirt
 First add yourself as a user of libvirt:
