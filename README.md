@@ -1,5 +1,5 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10, done completely through the command line, no GUI required.
+A guide to macOS virtualization on Ubuntu Server 17.10 & 18.04, done completely through the command line, no GUI required.
 
 Please star this guide if it is useful!
 
