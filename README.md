@@ -1,8 +1,6 @@
 # macos-kvm-pci-passthrough
 A guide to macOS virtualization on Ubuntu Server 17.10 & 18.04, done completely through the command line, no GUI required.
 
-Please star this guide if it is useful!
-
 Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
 Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS than Linux. However, I still needed to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we don't have to deal with the problems that Hackintosh users must endure.
@@ -399,6 +397,7 @@ Use ```<input type='mouse' bus='usb'/>``` instead of ```<input type='tablet' bus
 If you ever need to delete your VM:
 Type ```sudo virsh undefine --nvram macos```. Keep in mind if you add it back, you must go through the process of changing the resolution in the UEFI again.
 
+Please star this guide if it is useful!
 
 ## Resources
 
