@@ -95,7 +95,7 @@ nano clover-image.sh
 ```
 Change in the first line `/bin/sh` to `/bin/bash` (might be fixed in future)
 
-#### Mojave fix for APFS Drives: add the line 
+### Mojave fix for APFS Drives: add the line 
 ```
 fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
 ```
@@ -128,6 +128,12 @@ This results in a file called `clover.raw` being created in your current directo
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
 (Warning, it turns out that newer versions of this file have problems booting macOS...)
+Simply download the two OVMF files and place them in the same folder as your VM. Then change the XML file such that the following two lines point to the (full) paths to the corresponding files.
+```
+<loader>OVMF_CODE-pure-efi.fd</loader>
+<nvram template='THIS***OVMF_VARS-pure-efi.fd'>NOT*THIS***/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+```
+### Old, NOT WORKING
 Download the .rpm file that contains `*ovmf-x64*` from the following page:
 https://www.kraxel.org/repos/jenkins/edk2/
 
