@@ -54,10 +54,6 @@ Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager
 ```
 sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 ```
-For Debian 9 (DOES NOT WORK):
-``` 
-sudo apt-get install qemu-kvm libvirt-clients virtinst bridge-utils libvirt-daemon
-```
 
 ## Enabling Kernel Support for Passthrough
 These are the kernel flags:
@@ -91,13 +87,15 @@ Open the file for editing:
 ```
 nano clover-image.sh
 ```
-Change in the first line `/bin/sh` to `/bin/bash` (might be fixed in future)
+Change the first line `/bin/sh` to `/bin/bash`
 
-### Mojave fix for APFS Drives: add the line 
+### Mojave Fix for APFS Drives
+If you are running Mojave, it will fail to boot unless you add the line: 
 ```
 fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
 ```
-Before the `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
+Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
+
 
 Now download the latest Clover Bootloader iso from the following webpage:
 https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
@@ -125,13 +123,23 @@ This results in a file called `clover.raw` being created in your current directo
 
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
-(Warning, it turns out that newer versions of this file have problems booting macOS...)
-Simply download the two OVMF files and place them in the same folder as your VM. Then change the XML file such that the following two lines point to the (full) paths to the corresponding files.
+Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the XML file such that the following two paths point to the full paths of the corresponding files.
+
 ```
 <loader>OVMF_CODE-pure-efi.fd</loader>
-<nvram template='THIS***OVMF_VARS-pure-efi.fd'>NOT*THIS***/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+        ^
+	| 
+	\--- Add the path here
+	
+<nvram template='OVMF_VARS-pure-efi.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+		^
+		|
+		\--- And here
 ```
-### Old, NOT WORKING
+
+### SKIP, NOT WORKING
+Warning: Recent versions of this file have problems booting macOS ...
+
 Download the .rpm file that contains `*ovmf-x64*` from the following page:
 https://www.kraxel.org/repos/jenkins/edk2/
 
@@ -151,7 +159,7 @@ We need to use `qemu-img` to create a virtual disk to install macOS to. Change 9
 cd /where/you/want/the/disk/to/be
 qemu-img create -f qcow2 hd.qcow2 90G
 ```
-(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file. Delete the entire line that says `qcow2` in the macos.xml file.)
+(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file by deleting the entire line that says `qcow2` in the macos.xml file.)
 
 ## Configuring the virtual machine
 
@@ -187,12 +195,14 @@ Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'
 
 #### VNC
 `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
+
 For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+
 To create a tunnel:
 ```
 ssh -L 5900:127.0.0.1:5900 remote_server
 ```
-And then point your VNC client towards `localhost`.
+And then point your own VNC client towards `localhost`.
 
 ## Configuring libvirt
 First add yourself as a user of libvirt:
@@ -232,8 +242,8 @@ Hit `ESC`, `Y`, `ESC`. Finally, select `Reset`, otherwise the settings will not 
 ## Installing macOS
 
 Once the Clover bootloader is displayed, hit enter on the Install image.
-The Installer will take several minutes to boot up, and will look frozen most of the time.
-I would say give it at least 15 minutes before giving up.
+The Installer will take several minutes to boot up, and may look frozen most of the time.
+I would say give it 15 minutes before giving up.
 
 Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
 Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
@@ -405,3 +415,7 @@ https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
 
 https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
 
+## Installing QEMU for Debian 9 (Does not support macOS yet):
+``` 
+sudo apt-get install qemu-kvm libvirt-clients virtinst bridge-utils libvirt-daemon
+```
