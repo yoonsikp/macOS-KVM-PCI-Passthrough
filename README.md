@@ -90,11 +90,11 @@ nano clover-image.sh
 Change the first line `/bin/sh` to `/bin/bash`
 
 ### Mojave Fix for APFS Drives
-If you are running Mojave, it will fail to boot unless you add the line: 
-```
-fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
-```
-Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
+  If you are running Mojave, it will fail to boot unless you add the line: 
+  ```
+  fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
+  ```
+  Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
 
 
 Now download the latest Clover Bootloader iso from the following webpage:
