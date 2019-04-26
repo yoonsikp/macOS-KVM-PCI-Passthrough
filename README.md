@@ -148,14 +148,14 @@ We need to use `qemu-img` to create a virtual disk to install macOS to.
 
 ## Configuring the virtual machine
 Download the `macos.xml` file from the git directory. This file defines the virtual machine.
-* Edit the file to fit your needs
-  #### RAM
-  `<memory unit='GB'>4</memory>`
-  #### CPU Cores
-  `<vcpu>2</vcpu>`
-  #### Disks and Install Media
-  Change all the file paths in the following section to match your system. Make sure to use full paths.
-  ```
+Edit the file to fit your needs
+#### RAM
+`<memory unit='GB'>4</memory>`
+#### CPU Cores
+`<vcpu>2</vcpu>`
+#### Disks and Install Media
+Change all the file paths in the following section to match your system. Make sure to use full paths.
+```
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/clover.raw'/>
       <target dev='sda' bus='sata'/>
@@ -169,22 +169,21 @@ Download the `macos.xml` file from the git directory. This file defines the virt
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
-  ```
-  Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
+```
+Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
 
-  Later, we will delete the lines for the 10.13.1.img install media. 
+Later, we will delete the lines for the 10.13.1.img install media. 
 
-  Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
+Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
 
-  #### VNC
-  `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
-
-  For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
-  * To create a SSH tunnel run:
+#### VNC
+`<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
+For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+* To create a SSH tunnel run:
   ```
   ssh -L 5900:127.0.0.1:5900 remote_server
   ```
-  * Point your own VNC client towards `localhost`.
+* Point your own VNC client towards `localhost`.
 
 ## Configuring libvirt
 * First add yourself as a user of libvirt:
@@ -343,14 +342,14 @@ For the graphics card definition, check the commented-out block in `macos.xml`.
 
 Note, you cannot passthrough a `PCI bridge` to a VM.
 ## Autostart the VM
-* Enable autostart
-  ```
-  sudo virsh autostart macos
-  ```
-* Disable autostart
-  ```
-  sudo virsh autostart macos --disable
-  ```
+Enable autostart
+```
+sudo virsh autostart macos
+```
+Disable autostart
+```
+sudo virsh autostart macos --disable
+```
 ## Troubleshooting
 
 A reminder that Clover frequently freezes, so you should always edit the config.plist file instead.
