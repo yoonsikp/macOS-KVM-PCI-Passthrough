@@ -38,9 +38,7 @@ Allows me to run a display off of macOS, as well as accelerate the rendering of 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
 * Download the High Sierra installer from the App Store.
-* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.)
-  (Much quicker method: Use Disk Utility to create a blank sparse image file. Format it as HFS+. Then run the command to create the usb media on the sparse image. Once completed, use the `dd` command below.)
-
+* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.) A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
 * Now, convert the bootable USB Drive back into an `.img` file. Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
   ```
   sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.13.1.img
@@ -49,128 +47,115 @@ Let's begin with the step that requires a Mac.
 
 ## Installing QEMU
 Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on Ubuntu:
-```
-sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
-```
+  ```
+  sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
+  ```
 
 ## Enabling Kernel Support for Passthrough
 These are the kernel flags:
-`intel_iommu=on` allows PCIe passthrough
-`iommu=pt` speeds up the PCIe passthrough (optional, remove if something doesn't work)
+* `intel_iommu=on` allows PCIe passthrough
+* `iommu=pt` speeds up the PCIe passthrough (optional, remove if something doesn't work)
 
-Open the grub configuration:
-```
-sudo nano /etc/default/grub
-```
-Change the following line:
-```
-GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
-```
-Update the host bootloader:
-```
-sudo update-grub  
-```
+* Open the grub configuration:
+  ```
+  sudo nano /etc/default/grub
+  ```
+* Change the following line:
+  ```
+  GRUB_CMDLINE_LINUX_DEFAULT="intel_iommu=on iommu=pt"
+  ```
+* Update the host bootloader:
+  ```
+  sudo update-grub  
+  ```
 
 ## Creating the macOS Bootloader
-We need to install `libguestfs-tools` in order to create a Clover bootloader.
-```
-sudo apt install libguestfs-tools
-```
-
-Download the script for making the bootloader:
-```
-wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
-```
-Open the file for editing:
-```
-nano clover-image.sh
-```
-Change the first line `/bin/sh` to `/bin/bash`
-
-### Mojave Fix for APFS Drives
-*   If you are running Mojave, it will fail to boot unless you add the line: 
+* We need to install `libguestfs-tools` in order to create a Clover bootloader.
+  ```
+  sudo apt install libguestfs-tools
+  ```
+* Download the script for making the bootloader:
+  ```
+  wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
+  ```
+* Open the file for editing and change the first line `/bin/sh` to `/bin/bash`
+  ```
+  nano clover-image.sh
+  ```
+  
+  #### Mojave Fix for APFS Drives
+  * If you are running Mojave, it will fail to boot unless you add the line: 
     ```
     fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
     ```
-*   Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
+  * Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
 
 
-Now download the latest Clover Bootloader iso from the following webpage:
-https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
+* Now download the latest Clover Bootloader iso from the following webpage: https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
 
-Extract it
-```
-tar --lzma -xvf CloverISO-4289.tar.lzma
-```
+* Extract it
+  ```
+  tar --lzma -xvf CloverISO-4289.tar.lzma
+  ```
 
-Lastly, download `config.plist`, required by Clover, from my repository:
+* Lastly, download `config.plist`, required by Clover, from this repository. (Later, in order to get iMessage/iCloud working, we will have to edit this config.plist using Clover Configurator)
+  ```
+  wget https://raw.githubusercontent.com/yoonsikp/macos-kvm-pci-passthrough/master/config.plist
+  ```
 
-```
-wget https://raw.githubusercontent.com/yoonsikp/macos-kvm-pci-passthrough/master/config.plist
-```
-(Later, in order to get iMessage/iCloud working, we will have to edit this config.plist using Clover Configurator)
-
-Now we can run the script:
-```
-chmod 777 ./clover-image.sh
-sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg config.plist
-```
-This results in a file called `clover.raw` being created in your current directory.
+* Now we can run the script, which results in a file called `clover.raw` being created in your current directory:
+  ```
+  chmod 777 ./clover-image.sh
+  sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg config.plist
+  ```
 
 ## Configuring UEFI (OVMF)
-
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
-Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the XML file such that the following two paths point to the full paths of the corresponding files.
+* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the XML file such that the following two paths point to the full paths of the corresponding files.
 
-```
-<loader>OVMF_CODE-pure-efi.fd</loader>
-        ^
-	| 
-	\--- Add the path here
-	
-<nvram template='OVMF_VARS-pure-efi.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
-		^
-		|
-		\--- And here
-```
+  ```
+  <loader>OVMF_CODE-pure-efi.fd</loader>
+          ^
+          | 
+          \--- Add the path here
+  
+  <nvram template='OVMF_VARS-pure-efi.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+                  ^
+                  |
+                  \--- And here
+  ```
+  #### SKIP, NOT WORKING
+  Warning: Recent versions of this file have problems booting macOS ...
+  Download the .rpm file that contains `*ovmf-x64*` from the following page:
+  https://www.kraxel.org/repos/jenkins/edk2/
 
-### SKIP, NOT WORKING
-Warning: Recent versions of this file have problems booting macOS ...
-
-Download the .rpm file that contains `*ovmf-x64*` from the following page:
-https://www.kraxel.org/repos/jenkins/edk2/
-
-Install `rpm2cpio` and extract the UEFI firmware to your root directory:
-
-```
-sudo apt install rpm2cpio
-cd /
-rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
-```
+  Install `rpm2cpio` and extract the UEFI firmware to your root directory:
+  ```
+  sudo apt install rpm2cpio
+  cd /
+  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
+  ```
 
 ## Creating a virtual disk for installation
-
-We need to use `qemu-img` to create a virtual disk to install macOS to. Change 90G, to however big or small you want your virtual machine's drive size to be.
-
-```
-cd /where/you/want/the/disk/to/be
-qemu-img create -f qcow2 hd.qcow2 90G
-```
-(`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file by deleting the entire line that says `qcow2` in the macos.xml file.)
+We need to use `qemu-img` to create a virtual disk to install macOS to.
+* Run the command, and change `90G`, to however big or small you want your virtual machine's drive size to be.
+  ```
+  cd /where/you/want/the/disk/to/be
+  qemu-img create -f qcow2 hd.qcow2 90G
+  ```
+  (`-f qcow2` compresses the disk image. If you wanted, you could always create a raw file using the option `-f raw` instead, and you would have a 90GB file on your disk. After that, don't forget to modify your macos.xml file by deleting the entire line that says `qcow2` in the macos.xml file.)
 
 ## Configuring the virtual machine
-
 Download the `macos.xml` file from the git directory. This file defines the virtual machine.
-
-Edit the `macos.xml` to fit your needs
-#### RAM
-`<memory unit='GB'>4</memory>`
-#### CPU Cores
-` <vcpu>2</vcpu>`
-#### Disks and Install Media
-Change all the file paths in the following section to match your system. Make sure to use full paths.
-```
+* Edit the file to fit your needs
+  #### RAM
+  `<memory unit='GB'>4</memory>`
+  #### CPU Cores
+  `<vcpu>2</vcpu>`
+  #### Disks and Install Media
+  Change all the file paths in the following section to match your system. Make sure to use full paths.
+  ```
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/clover.raw'/>
       <target dev='sda' bus='sata'/>
@@ -184,69 +169,60 @@ Change all the file paths in the following section to match your system. Make su
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
-```
-Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
+  ```
+  Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
 
-Later, we will delete the lines for the 10.13.1.img install media. 
+  Later, we will delete the lines for the 10.13.1.img install media. 
 
-Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
+  Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
 
-#### VNC
-`<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
+  #### VNC
+  `<graphics type='vnc' port='-1' listen='0.0.0.0'/>`
 
-For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
-
-To create a tunnel:
-```
-ssh -L 5900:127.0.0.1:5900 remote_server
-```
-And then point your own VNC client towards `localhost`.
+  For those who are connecting to this VM outside of their home network, you can change listen to '127.0.0.1' and use a SSH tunnel to connect to it.
+  * To create a SSH tunnel run:
+  ```
+  ssh -L 5900:127.0.0.1:5900 remote_server
+  ```
+  * Point your own VNC client towards `localhost`.
 
 ## Configuring libvirt
-First add yourself as a user of libvirt:
-```
-sudo usermod -a -G libvirt username_here
-```
-Libvirt can accept the configurations of virtual machines using xml files.
-```
-sudo virsh define macos.xml
-```
-Next, we need to disable AppArmor, since it didn't seem to work with it enabled. (Warning, this may be insecure ...)
-```
-sudo nano /etc/libvirt/qemu.conf
-```
-Find the line `# security_driver = [...]`, uncomment it, and change it to `security_driver = "none"`.
-
+* First add yourself as a user of libvirt:
+  ```
+  sudo usermod -a -G libvirt username_here
+  ```
+* libvirt accepts the configurations of virtual machines using xml files.
+  ```
+  sudo virsh define macos.xml
+  ```
+* Next, we need to disable AppArmor, since it didn't seem to work with it enabled. (Warning, this may be insecure ...)
+  ```
+  sudo nano /etc/libvirt/qemu.conf
+  ```
+  Find the line `# security_driver = [...]`, uncomment it, and change it to `security_driver = "none"`.
 
 ## Connecting to the virtual machine
 
-Start the virtual machine:
-```
-sudo virsh start macos
-```
-Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) or gvncviewer, and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
+* Start the virtual machine:
+  ```
+  sudo virsh start macos
+  ```
+* Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) or gvncviewer, and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
-Quickly press F2 (fn+F2 on Mac) (or Esc on current TianoCore releases) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
+* Quickly press F2 (fn+F2 on Mac) (or Esc on current TianoCore releases) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
+  ```
+  sudo virsh destroy macos
+  ```
 
-```
-sudo virsh destroy macos
-```
-
-It's important to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. 
-
-In the setup go to `Device Manager -> OVMF Platform Configuration -> Change Preferred` and select `1024x768`.
-Hit `ESC`, `Y`, `ESC`. Finally, select `Reset`, otherwise the settings will not be applied to the boot. 
+* It's important to enter the setup screen so we can change the resolution of the UEFI to match that of macOS, since we are using a QEMU display. Go to `Device Manager -> OVMF Platform Configuration -> Change Preferred` and select `1024x768`.
+* Hit `ESC`, `Y`, `ESC`. Finally, select `Reset`, otherwise the settings will not be applied to the boot. 
 
 ## Installing macOS
 
-Once the Clover bootloader is displayed, hit enter on the Install image.
-The Installer will take several minutes to boot up, and may look frozen most of the time.
-I would say give it 15 minutes before giving up.
-
-Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
-Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
-
-Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
+* Once the Clover bootloader is displayed, hit enter on the Install image. The Installer will take several minutes to boot up, and may look frozen most of the time. I would say give it 15 minutes before giving up.
+* Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
+* Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
+* Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
 ## Setting Up macOS for the first time and Networking (Important!)
 
@@ -257,27 +233,28 @@ Once completed, we can fix the networking. macOS has a bug where it believes tha
 sudo virsh domif-setlink macos vnet0 down
 sudo virsh domif-setlink macos vnet0 up
 ```
-
 ## Cleaning Up / Modifying the macos.xml configuration file
+We are almost done.
 
-After shutting down the macOS machine safely, we can edit macos.xml to remove the following block to get rid of the installation media:
-```
+* Shutdown the macOS machine safely
+* Edit the macos.xml file and remove the following block to get rid of the installation media:
+  ```
     <disk type='file' device='disk'>
       <source file='/rust/storage/hackintosh/10.13.1.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
-```
-Finally, run:
-```
-sudo virsh define macos.xml
-```
-
+  ```
+* Finally, redefine the virtual machine:
+  ```
+  sudo virsh define macos.xml
+  ```
 ## iCloud/iMessage
-Using your Mac, download Clover Configurator, and open the config.plist from your host.
-Edit it using the following methods
-http://www.fitzweekly.com/2016/02/hackintosh-imessage-tutorial.html
-Copy the file back to your server. Go to the bottom of this guide and recreate your Clover bootloader.
-Once you start the VM, open a terminal prompt, type `sudo nvram -c`, then `sudo reboot`.
+This section requires macOS.
+
+* Download Clover Configurator, and open the `config.plist` file
+* Edit it using the following methods: http://www.fitzweekly.com/2016/02/hackintosh-imessage-tutorial.html
+* Copy the file back to your server. Go to the "Troubleshooting" section of this guide and recreate your Clover bootloader.
+* Start the VM, open a Terminal window, and run `sudo nvram -c`, then `sudo reboot`.
 
 ## PCI-Passthrough for Networking
 The networking bug above annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :).
@@ -366,14 +343,14 @@ For the graphics card definition, check the commented-out block in `macos.xml`.
 
 Note, you cannot passthrough a `PCI bridge` to a VM.
 ## Autostart the VM
-Enable autostart
-```
-sudo virsh autostart macos
-```
-Disable autostart
-```
-sudo virsh autostart macos --disable
-```
+* Enable autostart
+  ```
+  sudo virsh autostart macos
+  ```
+* Disable autostart
+  ```
+  sudo virsh autostart macos --disable
+  ```
 ## Troubleshooting
 
 A reminder that Clover frequently freezes, so you should always edit the config.plist file instead.
