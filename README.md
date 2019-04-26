@@ -118,10 +118,9 @@ Next we need to install the UEFI (a successor to BIOS) for QEMU.
                   \--- And here
   ```
 #### SKIP, NOT WORKING
-  Warning: Recent versions of this file have problems booting macOS ...
-  Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
-
-  Install `rpm2cpio` and extract the UEFI firmware to your root directory:
+Warning: Recent versions of this file have problems booting macOS ...
+* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
+* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
   ```
   sudo apt install rpm2cpio
   cd /
