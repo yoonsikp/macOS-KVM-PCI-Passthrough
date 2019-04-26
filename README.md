@@ -77,23 +77,20 @@ These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrou
   wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
   ```
 * However, the `clover-image.sh` script requires some edits:
-  * change the first line from `#!/bin/sh` to `#!/bin/bash`
-  #### Mojave Fix for APFS Drives
-  * For Mojave users, it will fail to boot unless you add the line: 
+  * Change the first line from `#!/bin/sh` to `#!/bin/bash`
+  #### For Mojave Users (APFS Drivers)
+  * Mojave users need to add the following line right above the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`: 
     ```
     fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
     ```
-    Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
-
-
-* Now download the latest Clover Bootloader iso from the following webpage: https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
+* Download the latest Clover Bootloader iso from the following webpage: https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
 
 * Extract it
   ```
   tar --lzma -xvf CloverISO-4289.tar.lzma
   ```
 
-* Lastly, download `config.plist`, required by Clover, from this repository. (Later, in order to get iMessage/iCloud working, we will have to edit this config.plist using Clover Configurator)
+* Lastly, download `config.plist` from this repository. (Later, in order to get iMessage/iCloud working, we will have to edit this config.plist using Clover Configurator)
   ```
   wget https://raw.githubusercontent.com/yoonsikp/macos-kvm-pci-passthrough/master/config.plist
   ```
