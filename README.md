@@ -117,17 +117,17 @@ Next we need to install the UEFI (a successor to BIOS) for QEMU.
                   |
                   \--- And here
   ```
-  #### SKIP, NOT WORKING
-  Warning: Recent versions of this file have problems booting macOS ...
-  Download the .rpm file that contains `*ovmf-x64*` from the following page:
-  https://www.kraxel.org/repos/jenkins/edk2/
+#### SKIP, NOT WORKING
+Warning: Recent versions of this file have problems booting macOS ...
+Download the .rpm file that contains `*ovmf-x64*` from the following page:
+https://www.kraxel.org/repos/jenkins/edk2/
 
-  Install `rpm2cpio` and extract the UEFI firmware to your root directory:
-  ```
-  sudo apt install rpm2cpio
-  cd /
-  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
-  ```
+Install `rpm2cpio` and extract the UEFI firmware to your root directory:
+```
+sudo apt install rpm2cpio
+cd /
+rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
+```
 
 ## Creating a virtual disk for installation
 We need to use `qemu-img` to create a virtual disk to install macOS to.
