@@ -263,12 +263,10 @@ IOMMU Group 9 00:1f.6 Ethernet controller [0200]: Intel Corporation Ethernet Con
 
 I chose to passthrough the I219-LM ethernet controller, and thankfully there are no other devices in IOMMU Group 9.
 
-We need to load the kernel modules/drivers that will attach to our PCI devices during the boot process. We will modify the kernel image that is loaded into the RAM on bootup. Note that `vfio-pci` is an alias for `vfio_pci`, and that `vfio_pci` depends on `vfio` and `vfio_virqfd`.
+We need to load the kernel modules/drivers that will attach to our PCI devices during the boot process. We will modify the kernel image that is loaded into the RAM on bootup. Note that `vfio-pci` is an alias for `vfio_pci`, and that `vfio_pci` depends on `vfio` and `vfio_virqfd`. 
 
 ```
-sudo nano /etc/initramfs-tools/modules 
-```
-```
+# sudo nano /etc/initramfs-tools/modules 
 vfio
 vfio_iommu_type1
 vfio_virqfd
@@ -277,9 +275,7 @@ vfio_pci ids=8086:15b7 disable_vga=1
 
 Stop the host (Linux) from loading the ethernet driver. You can find the name of the currently loaded driver by running the command `lspci -v`. The filename should start with the name of the driver you want to blacklist.
 ```
-sudo nano /etc/modprobe.d/e1000e.conf
-```
-```
+# sudo nano /etc/modprobe.d/e1000e.conf
 blacklist e1000e
 ```
 Update your boot image
@@ -311,9 +307,7 @@ Lastly, start the VM. If any network interface names are numbered oddly on the m
 Same as above, except we need to attach the `vfio_pci` driver to multiple PCI-e addresses. Below, I also passthrough my entire USB 3.0 controller! 
 
 ```
-sudo nano /etc/initramfs-tools/modules 
-```
-```
+# sudo nano /etc/initramfs-tools/modules 
 vfio
 vfio_iommu_type1
 vfio_virqfd
@@ -321,9 +315,7 @@ vfio_pci ids=8086:15b7,8086:a12f,1002:67ff,1002:aae0 disable_vga=1
 ```
 
 ```
-sudo nano /etc/modprobe.d/amdgpu.conf
-```
-```
+# sudo nano /etc/modprobe.d/amdgpu.conf
 blacklist amdgpu
 ```
 ```
