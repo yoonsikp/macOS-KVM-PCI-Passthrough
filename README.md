@@ -52,10 +52,7 @@ Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager
   ```
 
 ## Enabling Kernel Support for Passthrough
-These are the kernel flags:
-* `intel_iommu=on` allows PCIe passthrough
-* `iommu=pt` speeds up the PCIe passthrough (optional, remove if something doesn't work)
-
+These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrough), and `iommu=pt` (speeds up the PCIe passthrough, optional - remove if something doesn't work)
 * Open the grub configuration:
   ```
   sudo nano /etc/default/grub
@@ -78,17 +75,14 @@ These are the kernel flags:
   ```
   wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
   ```
-* Open the file for editing and change the first line `/bin/sh` to `/bin/bash`
-  ```
-  nano clover-image.sh
-  ```
-  
+* However, the `clover-image.sh` script requires some edits:
+  * change the first line from `#!/bin/sh` to `#!/bin/bash`
   #### Mojave Fix for APFS Drives
-  * If you are running Mojave, it will fail to boot unless you add the line: 
+  * For Mojave users, it will fail to boot unless you add the line: 
     ```
     fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
     ```
-  * Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
+    Right before the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`.
 
 
 * Now download the latest Clover Bootloader iso from the following webpage: https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
