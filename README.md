@@ -38,7 +38,8 @@ Allows me to run a display off of macOS, as well as accelerate the rendering of 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
 * Download the High Sierra installer from the App Store.
-* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.) A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
+* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.)
+  * A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
 * Now, convert the bootable USB Drive back into an `.img` file. Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
   ```
   sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.13.1.img
