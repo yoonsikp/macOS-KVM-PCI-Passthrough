@@ -42,14 +42,19 @@ Let's begin with the step that requires a Mac.
 * Follow the rest of the Apple Support Document, except replace `MyVolume` with the volume above.
 * Now, convert the virtual drive back into an `.img` file. Type `diskutil list` to find out the name of your virtual drive (the 12 GB drive), and replace `/dev/disk3` in the following command:
   ```
-  bash -lic 'sudo dd bs=1m if=/dev/disk3 of=10.15.0.img'
+  sudo dd bs=1m if=/dev/disk3 of=10.15.0.img
   ```
 * Copy the bootable `.img` file to your Server.
 
-## Installing QEMU
+## Installing QEMU for Ubuntu >= 18.04
 Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on your Ubuntu machine:
   ```
   sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
+  ```
+## Installing QEMU for Debian >= 10
+This is for Debian installations
+  ``` 
+  sudo apt-get install qemu-kvm libvirt-clients libvirt-daemon-system virtinst bridge-utils 
   ```
 
 ## Enabling Kernel Support for Passthrough
@@ -163,15 +168,6 @@ Next we need to install the UEFI (a successor to BIOS) for QEMU.
                   ^
                   |
                   \--- And here
-  ```
-#### SKIP, NOT WORKING
-Warning: Recent versions of this file have problems booting macOS ...
-* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
-* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
-  ```
-  sudo apt install rpm2cpio
-  cd /
-  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
   ```
 
 ## Configuring libvirt
@@ -376,7 +372,12 @@ https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
 
 https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
 
-## Installing QEMU for Debian 10:
-``` 
-sudo apt-get install qemu-kvm libvirt-clients virtinst bridge-utils libvirt-daemon libvirt-daemon-system
-```
+#### SKIP, NOT WORKING
+Warning: Recent versions of this file have problems booting macOS ...
+* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
+* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
+  ```
+  sudo apt install rpm2cpio
+  cd /
+  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
+  ```
