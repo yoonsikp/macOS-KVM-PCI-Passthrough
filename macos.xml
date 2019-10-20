@@ -95,7 +95,7 @@ the following method:
     
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 <video>
-  <model type='vga' vram='65536'/>
+  <model type='vga'/>
 </video>
   </devices>
   <qemu:commandline>
