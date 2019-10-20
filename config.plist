@@ -44,7 +44,7 @@
 	<key>SystemParameters</key>
 	<dict>
 		<key>InjectKexts</key>
-		<false/>
+		<string>Detect<string/>
 		<key>InjectSystemID</key>
 		<true/>
 	</dict>
