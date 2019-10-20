@@ -196,6 +196,11 @@ Warning: Recent versions of this file have problems booting macOS ...
   ```
   sudo virsh start macos
   ```
+  
+* If you get an error about how network `default` is not active, then run:
+  ```
+  sudo virsh net-start default
+  ```
 * Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) or gvncviewer, and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
 * Quickly press Esc to enter the setup screen. If you missed it you can stop the virtual machine and try again:
