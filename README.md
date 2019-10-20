@@ -156,18 +156,18 @@ For those who are connecting to this VM outside of their home network, you can c
 ## Configuring UEFI (OVMF)
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
-* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding files.
+* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding OVMF files. Then change the last path to point to the directory of the files.
 
   ```
-  <loader>OVMF_CODE.fd</loader>
-          ^
-          | 
-          \--- Add the path here
+  <loader readonly='yes' type='pflash'>/home/yoonsik/macos/OVMF_CODE.fd</loader>
+                                       ^
+                                       | 
+                                       \--- Change path here
   
-  <nvram template='OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
-                  ^
-                  |
-                  \--- And here
+  <nvram template='/home/yoonsik/macos/OVMF_VARS.fd'>/home/yoonsik/macos/nvram-macos_VARS.fd</nvram>
+                  ^                                  ^                   ^
+                  |                                  |                   |
+                  \--- And here                      \- change directory -/
   ```
 
 ## Configuring libvirt
@@ -372,7 +372,7 @@ https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
 
 https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
 
-#### SKIP, NOT WORKING
+## SKIP, NOT WORKING
 Warning: Recent versions of this file have problems booting macOS ...
 * Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
 * Install `rpm2cpio` and extract the UEFI firmware to your root directory:
