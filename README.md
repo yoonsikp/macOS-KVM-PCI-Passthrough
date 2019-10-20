@@ -1,5 +1,5 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10 & 18.04, done completely through the command line, no GUI required.
+A guide to macOS virtualization on Ubuntu Server 17.10 & 18.04 + Debian 10, done completely through the command line, no GUI required.
 
 Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
@@ -23,7 +23,7 @@ GPU: Intel HD 530 & AMD Radeon RX 560
 Ethernet: Intel I210 and Intel I219-LM
 SSD: Samsung SM951 NVMe
 HDD: 2 x WD Red 3TB
-Host OS: Ubuntu Server 17.10
+Host OS: Ubuntu Server 18.04
 ```
 
 There are two PCIe devices I wish to passthrough:
@@ -32,7 +32,7 @@ There are two PCIe devices I wish to passthrough:
 There is poor support in macOS for the Intel I210, so I chose the Intel I219-LM. The I210 will be used for the host.
 
 - Graphics Card (AMD Radeon RX 560)
-Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of the box in macOS 10.13.
+Allows me to run a display off of macOS, as well as accelerate the rendering of macOS desktop. Furthermore, the RX 560 works out of the box in macOS 10.14.
 
 
 ## Creating the install image
@@ -129,13 +129,13 @@ Change all the file paths in the following section to match your system. Make su
       <target dev='sdb' bus='sata'/>
     </disk>
     <disk type='file' device='disk'>
-      <source file='/rust/storage/hackintosh/10.13.1.img'/>
+      <source file='/rust/storage/hackintosh/10.15.0.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
 ```
 Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
 
-Later, we will delete the lines for the 10.13.1.img install media. 
+Later, we will delete the lines for the 10.15.0.img install media. 
 
 Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
 
@@ -198,7 +198,7 @@ Warning: Recent versions of this file have problems booting macOS ...
   ```
 * Download a VNC viewer on another computer, such as RealVNC Viewer (https://www.realvnc.com/en/connect/download/viewer/) or gvncviewer, and connect to the server. (In order to fix the Left Command Key not working in RealVNC Viewer, go to `Preferences -> Expert -> LeftCmdKey` and set it to `Super_L`)
 
-* Quickly press F2 (fn+F2 on Mac) (or Esc on current TianoCore releases) to enter the setup screen. If you missed it you can stop the virtual machine and try again:
+* Quickly press Esc to enter the setup screen. If you missed it you can stop the virtual machine and try again:
   ```
   sudo virsh destroy macos
   ```
@@ -208,7 +208,7 @@ Warning: Recent versions of this file have problems booting macOS ...
 
 ## Installing macOS
 
-* Once the Clover bootloader is displayed, hit enter on the Install image. The Installer will take several minutes to boot up, and may look frozen most of the time. I would say give it 15 minutes before giving up.
+* Once the Clover bootloader is displayed, hit enter on the Install image. The Installer will take several minutes to boot up, and may look frozen most of the time. I would say give it ~10 minutes before giving up.
 * Select your language, go to Disk Utility, and click "Show All Devices" in the View menu.
 * Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
 * Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
@@ -229,7 +229,7 @@ We are almost done.
 * Edit the macos.xml file and remove the following block to get rid of the installation media:
   ```
     <disk type='file' device='disk'>
-      <source file='/rust/storage/hackintosh/10.13.1.img'/>
+      <source file='/rust/storage/hackintosh/10.15.0.img'/>
       <target dev='sdc' bus='sata'/>
     </disk>
   ```
