@@ -66,6 +66,10 @@ These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrou
   ```
   sudo update-grub  
   ```
+* Restart your system
+  ```
+  sudo reboot
+  ```
 
 ## Creating the macOS Bootloader
 * We need to install `libguestfs-tools` in order to create a Clover bootloader.
@@ -74,20 +78,15 @@ These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrou
   ```
 * Download the script for making the bootloader:
   ```
-  wget https://git.kraxel.org/cgit/imagefish/plain/scripts/clover-image.sh
+  wget https://github.com/yoonsikp/macos-kvm-pci-passthrough/raw/master/create-clover.sh
   ```
-* However, the `clover-image.sh` script requires some edits:
-  * Change the first line from `#!/bin/sh` to `#!/bin/bash`
-  #### For Mojave Users (APFS Drivers)
-  * Mojave users need to add the following line right above the line `fish ls /ESP/EFI/CLOVER/drivers64UEFI`: 
-    ```
-    fish copy-in $nodef/ApfsDriverLoader-64.efi /ESP/EFI/CLOVER/drivers64UEFI
-    ```
-* Download the latest Clover Bootloader iso from the following webpage: https://sourceforge.net/projects/cloverefiboot/files/Bootable_ISO/
+  
+* Download the latest Clover Bootloader with filename CloverISO-XXXX.tar.lzma from the following webpage: 
+  https://github.com/Dids/clover-builder/releases
 
 * Extract it
   ```
-  tar --lzma -xvf CloverISO-4289.tar.lzma
+  tar --lzma -xvf CloverISO-5093.tar.lzma
   ```
 
 * Lastly, download `config.plist` from this repository. (Later, in order to get iMessage/iCloud working, we will have to edit this config.plist using Clover Configurator)
@@ -97,34 +96,8 @@ These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrou
 
 * Now we can run the script, which results in a file called `clover.raw` being created in your current directory:
   ```
-  chmod 777 ./clover-image.sh
-  sudo ./clover-image.sh --iso Clover-v2.4k-4289-X64.iso --img clover.raw --cfg config.plist
-  ```
-
-## Configuring UEFI (OVMF)
-Next we need to install the UEFI (a successor to BIOS) for QEMU.
-
-* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding files.
-
-  ```
-  <loader>OVMF_CODE.fd</loader>
-          ^
-          | 
-          \--- Add the path here
-  
-  <nvram template='OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
-                  ^
-                  |
-                  \--- And here
-  ```
-#### SKIP, NOT WORKING
-Warning: Recent versions of this file have problems booting macOS ...
-* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
-* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
-  ```
-  sudo apt install rpm2cpio
-  cd /
-  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
+  chmod 777 ./create-clover.sh
+  sudo ./create-clover.sh --iso Clover-v2.5k-5093-X64.iso --img clover.raw --cfg config.plist
   ```
 
 ## Creating a virtual disk for installation
@@ -174,6 +147,32 @@ For those who are connecting to this VM outside of their home network, you can c
   ssh -L 5900:127.0.0.1:5900 remote_server
   ```
 * Point your own VNC client towards `localhost`.
+
+## Configuring UEFI (OVMF)
+Next we need to install the UEFI (a successor to BIOS) for QEMU.
+
+* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding files.
+
+  ```
+  <loader>OVMF_CODE.fd</loader>
+          ^
+          | 
+          \--- Add the path here
+  
+  <nvram template='OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+                  ^
+                  |
+                  \--- And here
+  ```
+#### SKIP, NOT WORKING
+Warning: Recent versions of this file have problems booting macOS ...
+* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
+* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
+  ```
+  sudo apt install rpm2cpio
+  cd /
+  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
+  ```
 
 ## Configuring libvirt
 * First add yourself as a user of libvirt and/or kvm:
