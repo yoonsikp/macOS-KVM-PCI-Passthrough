@@ -104,7 +104,7 @@ These are the two kernel flags required: `intel_iommu=on` (allows PCIe passthrou
 ## Configuring UEFI (OVMF)
 Next we need to install the UEFI (a successor to BIOS) for QEMU.
 
-* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the XML file such that the following two paths point to the full paths of the corresponding files.
+* Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding files.
 
   ```
   <loader>OVMF_CODE-pure-efi.fd</loader>
@@ -176,9 +176,10 @@ For those who are connecting to this VM outside of their home network, you can c
 * Point your own VNC client towards `localhost`.
 
 ## Configuring libvirt
-* First add yourself as a user of libvirt:
+* First add yourself as a user of libvirt and/or kvm:
   ```
-  sudo usermod -a -G libvirt username_here
+  sudo usermod -aG libvirt $USER
+  sudo usermod -aG kvm $USER
   ```
 * libvirt accepts the configurations of virtual machines using xml files.
   ```
