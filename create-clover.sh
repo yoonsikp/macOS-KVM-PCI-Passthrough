@@ -149,6 +149,8 @@ msg "copy files to disk image"
 cp -v "$cfg" $WORK/config.plist
 fish mkdir                                     /ESP/EFI
 fish mkdir                                     /ESP/EFI/CLOVER
+fish mkdir                                     /ESP/EFI/CLOVER/kexts
+fish mkdir                                     /ESP/EFI/CLOVER/kexts/Other
 fish mkdir                                     /ESP/EFI/CLOVER/drivers
 fish copy-in $WORK/EFI/BOOT                    /ESP/EFI
 fish copy-in $WORK/EFI/CLOVER/CLOVERX64.efi    /ESP/EFI/CLOVER
