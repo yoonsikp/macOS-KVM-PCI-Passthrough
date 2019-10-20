@@ -42,7 +42,7 @@ Let's begin with the step that requires a Mac.
   * A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
 * Now, convert the bootable USB Drive back into an `.img` file. Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
   ```
-  bash -lic 'sudo dd bs=1m if=/dev/disk3 of=/Users/yoonsik/Desktop/10.15.0.img'
+  bash -lic 'sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.15.0.img'
   ```
 * Copy the bootable `.img` file to your Ubuntu Server.
 
