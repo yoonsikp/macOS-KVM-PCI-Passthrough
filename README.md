@@ -107,12 +107,12 @@ Next we need to install the UEFI (a successor to BIOS) for QEMU.
 * Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding files.
 
   ```
-  <loader>OVMF_CODE-pure-efi.fd</loader>
+  <loader>OVMF_CODE.fd</loader>
           ^
           | 
           \--- Add the path here
   
-  <nvram template='OVMF_VARS-pure-efi.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
+  <nvram template='OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/macos-test-org-base_VARS.fd</nvram>
                   ^
                   |
                   \--- And here
