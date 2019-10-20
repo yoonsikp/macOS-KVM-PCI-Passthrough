@@ -1,5 +1,5 @@
 # macos-kvm-pci-passthrough
-A guide to macOS virtualization on Ubuntu Server 17.10 & 18.04 + Debian 10, done completely through the command line, no GUI required.
+A guide to macOS virtualization on Ubuntu Server 18.04 + Debian 10, done completely through the command line, no GUI required.
 
 Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
@@ -38,16 +38,16 @@ Allows me to run a display off of macOS, as well as accelerate the rendering of 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
 * Download the High Sierra installer from the App Store.
-* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 8GB flash drive if possible, as the install image we create will be the same size as your flash drive.)
+* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 12GB flash drive if possible, as the install image we create will be the same size as your flash drive.)
   * A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
 * Now, convert the bootable USB Drive back into an `.img` file. Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
   ```
   bash -lic 'sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.15.0.img'
   ```
-* Copy the bootable `.img` file to your Ubuntu Server.
+* Copy the bootable `.img` file to your Server.
 
 ## Installing QEMU
-Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on Ubuntu:
+Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on your Ubuntu machine:
   ```
   sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
   ```
