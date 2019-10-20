@@ -135,7 +135,7 @@ Change all the file paths in the following section to match your system. Make su
 ```
 Note that the Clover bootloader occupies the `sda` slot, i.e the first boot device.
 
-Later, we will delete the lines for the 10.15.0.img install media. 
+Later, we will delete the lines for the `10.15.0.img` install media. 
 
 Also, delete the line `<driver name='qemu' type='qcow2' cache='none' io='native'/>` if you used a `-f raw` image from earlier.
 
