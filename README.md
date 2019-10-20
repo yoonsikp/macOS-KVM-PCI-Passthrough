@@ -37,12 +37,12 @@ Allows me to run a display off of macOS, as well as accelerate the rendering of 
 
 ## Creating the install image
 Let's begin with the step that requires a Mac.
-* Download the High Sierra installer from the App Store.
-* Create a bootable image using a USB Drive: https://support.apple.com/en-us/HT201372 (Use a 12GB flash drive if possible, as the install image we create will be the same size as your flash drive.)
-  * A much quicker method is to use Disk Utility to create a blank sparse image file. Format it as HFS+. Then create the boot media using the sparse image. Once completed, continue with the `dd` command below.
-* Now, convert the bootable USB Drive back into an `.img` file. Type `diskutil list` to find out the name of your flash drive, and replace `/dev/disk3` in the following command:
+* Follow the instructions in https://support.apple.com/en-us/HT201372 to download the desired installer.
+* Now create a virtual USB Drive. Open Disk Utility, then navigate to `File, New Image, Blank Image...`. For the Image Format select `sparse disk image`. For Format choose `Mac OS Extended (Journaled)`. For Size, type in `12 GB`. Save it, and it should auto-mount in the left sidebar of Disk Utility. Click it, and note the path of the volume under `Mount Point:`.
+* Follow the rest of the Apple Support Document, except replace `MyVolume` with the volume above.
+* Now, convert the virtual drive back into an `.img` file. Type `diskutil list` to find out the name of your virtual drive (the 12 GB drive), and replace `/dev/disk3` in the following command:
   ```
-  bash -lic 'sudo dd bs=1m if=/dev/disk3 of=~/Desktop/10.15.0.img'
+  bash -lic 'sudo dd bs=1m if=/dev/disk3 of=10.15.0.img'
   ```
 * Copy the bootable `.img` file to your Server.
 
