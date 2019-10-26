@@ -3,6 +3,35 @@ A guide to macOS virtualization on Ubuntu Server 18.04 + Debian 10, done complet
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
 
+- [macOS-KVM-PCI-Passthrough](#macos-kvm-pci-passthrough)
+  * [Prerequisites](#prerequisites)
+      - [My System:](#my-system-)
+  * [Creating the install image](#creating-the-install-image)
+  * [Installing QEMU for Ubuntu Server 18.04 or Newer](#installing-qemu-for-ubuntu-server-1804-or-newer)
+  * [Installing QEMU for Debian 10 or Newer](#installing-qemu-for-debian-10-or-newer)
+  * [Enabling Kernel Support for Passthrough](#enabling-kernel-support-for-passthrough)
+  * [Creating the macOS Bootloader](#creating-the-macos-bootloader)
+  * [Creating a virtual disk for installation](#creating-a-virtual-disk-for-installation)
+  * [Configuring the virtual machine](#configuring-the-virtual-machine)
+      - [RAM](#ram)
+      - [CPU Cores](#cpu-cores)
+      - [Disks and Install Media](#disks-and-install-media)
+      - [VNC](#vnc)
+  * [Configuring UEFI (OVMF)](#configuring-uefi--ovmf-)
+  * [Configuring libvirt](#configuring-libvirt)
+  * [Connecting to the virtual machine](#connecting-to-the-virtual-machine)
+  * [Installing macOS](#installing-macos)
+  * [Setting Up macOS for the first time and Networking (Important)](#setting-up-macos-for-the-first-time-and-networking--important-)
+  * [Cleaning Up the macOS XML configuration file](#cleaning-up-the-macos-xml-configuration-file)
+  * [iCloud and iMessage](#icloud-and-imessage)
+  * [PCI Passthrough for Networking](#pci-passthrough-for-networking)
+  * [PCI Passthrough for Graphics Card](#pci-passthrough-for-graphics-card)
+  * [Autostart the VM](#autostart-the-vm)
+  * [Troubleshooting](#troubleshooting)
+  * [Resources](#resources)
+  * [Warning](#warning)
+
+
 ## Prerequisites
 You will need a Mac in order to download and create an install image.
 You should also use a Mac if you are using Clover Configurator to edit the Clover config.
@@ -42,12 +71,12 @@ Let's begin with the step that requires a Mac.
   ```
 * Copy the bootable `.img` file to your Server.
 
-## Installing QEMU for Ubuntu >= 18.04
+## Installing QEMU for Ubuntu Server 18.04 or Newer
 Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on your Ubuntu machine:
   ```
   sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
   ```
-## Installing QEMU for Debian >= 10
+## Installing QEMU for Debian 10 or Newer
 This is for Debian installations
   ``` 
   sudo apt-get install qemu-kvm libvirt-clients libvirt-daemon-system virtinst bridge-utils 
@@ -149,8 +178,8 @@ For those who are connecting to this VM outside of their home network, you can c
   ```
 * Point your own VNC client towards `localhost`.
 
-## Configuring UEFI (OVMF)
-Next we need to install the UEFI (a successor to BIOS) for QEMU.
+## Configuring UEFI
+Next we need to install a UEFI implementation for QEMU.
 
 * Simply download the two OVMF files from the repository and place them in the same folder as your VM. Then change the `macos.xml` file such that the following two paths point to the full paths of the corresponding OVMF files. Then change the last path to point to the directory of the files.
 
@@ -210,16 +239,16 @@ Next we need to install the UEFI (a successor to BIOS) for QEMU.
 * Find your QEMU HARDDISK in the left, make sure it is the correct size (~90 GB), and click Erase. Name your drive `Macintosh HD`. Use the options `Mac OS Extended (Journaled)` and `GUID Partition Map`. 
 * Quit Disk Utility and install macOS on Macintosh HD. It should reboot and boot to Macintosh HD, and finish the installation.
 
-## Setting Up macOS for the first time and Networking (Important!)
+## Setting Up macOS for the First Time and Networking
 
-Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may break things. Only set up user accounts, time zone, etc. While configuring the network, it may fail. That is fine. 
+Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may break things. Only set up user accounts, time zone, etc. While configuring the network, it may fail (or crash). That is fine. If it crashes, 
 
 Once completed, we can fix the networking. macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands in Ubuntu Server to fix it (on every boot!):
 ```
 sudo virsh domif-setlink macos vnet0 down
 sudo virsh domif-setlink macos vnet0 up
 ```
-## Cleaning Up / Modifying the macos.xml configuration file
+## Cleaning Up the macOS XML configuration file
 We are almost done.
 
 * Shutdown the macOS machine safely
@@ -234,7 +263,7 @@ We are almost done.
   ```
   sudo virsh define macos.xml
   ```
-## iCloud/iMessage
+## iCloud and iMessage
 This section requires macOS.
 
 * Download Clover Configurator, and open the `config.plist` file
@@ -242,7 +271,7 @@ This section requires macOS.
 * Copy the file back to your server. Go to the "Troubleshooting" section of this guide and recreate your Clover bootloader.
 * Start the VM, open a Terminal window, and run `sudo nvram -c`, then `sudo reboot`.
 
-## PCI-Passthrough for Networking
+## PCI Passthrough for Networking
 The networking bug above annoyed me so much, and because I was too lazy to set up tap networking, I ended up spending multiple hours setting up the PCI passthrough of one of my ethernet jacks :).
 
 Follow this section of ensuring the PCI-passthrough groups are valid from ArchWiki: https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Ensuring_that_the_groups_are_valid
@@ -297,7 +326,7 @@ sudo virsh define macos.xml
 ```
 Lastly, start the VM. If any network interface names are numbered oddly on the macOS VM, open `/Library/Preferences/SystemConfiguration` in Finder and delete `preferences.plist` and `NetworkInterfaces.plist`. Reboot the VM.
 
-## PCI-Passthrough for Graphics Card
+## PCI Passthrough for Graphics Card
 
 Same as above, except we need to attach the `vfio_pci` driver to multiple PCI-e addresses. Below, I also passthrough my entire USB 3.0 controller! 
 
