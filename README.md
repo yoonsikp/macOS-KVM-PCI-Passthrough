@@ -3,7 +3,7 @@ A guide to macOS virtualization on Ubuntu Server 18.04 + Debian 10, done complet
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
 
-- [macOS-KVM-PCI-Passthrough](#macos-kvm-pci-passthrough)
+- Table of Contents
   * [Prerequisites](#prerequisites)
       - [My System:](#my-system-)
   * [Creating the install image](#creating-the-install-image)
@@ -17,11 +17,11 @@ Virtualization technology has matured a lot in the past few years. The two bigge
       - [CPU Cores](#cpu-cores)
       - [Disks and Install Media](#disks-and-install-media)
       - [VNC](#vnc)
-  * [Configuring UEFI (OVMF)](#configuring-uefi--ovmf-)
+  * [Configuring UEFI](#configuring-uefi)
   * [Configuring libvirt](#configuring-libvirt)
   * [Connecting to the virtual machine](#connecting-to-the-virtual-machine)
   * [Installing macOS](#installing-macos)
-  * [Setting Up macOS for the first time and Networking (Important)](#setting-up-macos-for-the-first-time-and-networking--important-)
+  * [Setting Up macOS for the First Time and Networking](#setting-up-macos-for-the-first-time-and-networking)
   * [Cleaning Up the macOS XML configuration file](#cleaning-up-the-macos-xml-configuration-file)
   * [iCloud and iMessage](#icloud-and-imessage)
   * [PCI Passthrough for Networking](#pci-passthrough-for-networking)
