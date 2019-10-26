@@ -6,8 +6,7 @@ Virtualization technology has matured a lot in the past few years. The two bigge
 ## Table of Contents
   * [Prerequisites](#prerequisites)
   * [Creating the install image](#creating-the-install-image)
-  * [Installing QEMU for Ubuntu Server 18.04 or Newer](#installing-qemu-for-ubuntu-server-1804-or-newer)
-  * [Installing QEMU for Debian 10 or Newer](#installing-qemu-for-debian-10-or-newer)
+  * [Installing QEMU ](#installing-qemu)
   * [Enabling Kernel Support for Passthrough](#enabling-kernel-support-for-passthrough)
   * [Creating the macOS Bootloader](#creating-the-macos-bootloader)
   * [Creating a virtual disk for installation](#creating-a-virtual-disk-for-installation)
@@ -66,13 +65,15 @@ Let's begin with the step that requires a Mac.
   ```
 * Copy the bootable `.img` file to your Server.
 
-## Installing QEMU for Ubuntu Server 18.04 or Newer
-Install qemu (the hypervisor), libvirt (the VM daemon), virtinst (the VM manager) on your Ubuntu machine:
+## Installing QEMU 
+
+We need to install qemu (the hypervisor), libvirt (the VM daemon), and virtinst (the VM manager).
+
+If you have Ubuntu Server >= 18.04, then run the following command:
   ```
   sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
   ```
-## Installing QEMU for Debian 10 or Newer
-This is for Debian installations
+If you have Debian >= 10, then run the following:
   ``` 
   sudo apt-get install qemu-kvm libvirt-clients libvirt-daemon-system virtinst bridge-utils 
   ```
