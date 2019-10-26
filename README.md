@@ -2,7 +2,7 @@
 A guide to macOS virtualization on Ubuntu Server >= 18.04 and Debian >= 10, done completely through the command line, no GUI required.
 
 <p align="center">
-  <img src=https://github.com/yoonsikp/macOS-KVM-PCI-Passthrough/raw/master/bootup.gif?hi=true width=60%>
+  <img src=https://raw.githubusercontent.com/yoonsikp/macOS-KVM-PCI-Passthrough/master/bootup.gif width=60%>
  </p>
  <p align="center">
   macOS Catalina Booting on a Debian 10 Host
