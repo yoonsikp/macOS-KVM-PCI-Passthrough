@@ -1,4 +1,4 @@
-# macos-kvm-pci-passthrough
+# macOS-KVM-PCI-Passthrough
 A guide to macOS virtualization on Ubuntu Server 18.04 + Debian 10, done completely through the command line, no GUI required.
 
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
