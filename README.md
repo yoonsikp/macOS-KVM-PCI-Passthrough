@@ -21,10 +21,6 @@ Virtualization technology has matured a lot in the past few years. The two bigge
   * [PCI Passthrough for Networking](#pci-passthrough-for-networking)
   * [PCI Passthrough for Graphics Card](#pci-passthrough-for-graphics-card)
   * [Autostart the VM](#autostart-the-vm)
-  * [Troubleshooting](#troubleshooting)
-  * [Resources](#resources)
-  * [Warning](#warning)
-
 
 ## Prerequisites
 You will need a Mac in order to download and create an install image.
