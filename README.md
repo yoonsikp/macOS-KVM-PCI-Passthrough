@@ -5,7 +5,6 @@ Virtualization technology has matured a lot in the past few years. The two bigge
 
 - Table of Contents
   * [Prerequisites](#prerequisites)
-      - [My System:](#my-system-)
   * [Creating the install image](#creating-the-install-image)
   * [Installing QEMU for Ubuntu Server 18.04 or Newer](#installing-qemu-for-ubuntu-server-1804-or-newer)
   * [Installing QEMU for Debian 10 or Newer](#installing-qemu-for-debian-10-or-newer)
@@ -13,10 +12,6 @@ Virtualization technology has matured a lot in the past few years. The two bigge
   * [Creating the macOS Bootloader](#creating-the-macos-bootloader)
   * [Creating a virtual disk for installation](#creating-a-virtual-disk-for-installation)
   * [Configuring the virtual machine](#configuring-the-virtual-machine)
-      - [RAM](#ram)
-      - [CPU Cores](#cpu-cores)
-      - [Disks and Install Media](#disks-and-install-media)
-      - [VNC](#vnc)
   * [Configuring UEFI](#configuring-uefi)
   * [Configuring libvirt](#configuring-libvirt)
   * [Connecting to the virtual machine](#connecting-to-the-virtual-machine)
