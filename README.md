@@ -3,8 +3,6 @@ A guide to macOS virtualization on Ubuntu Server 18.04 + Debian 10, done complet
 
 Warning: There are a few annoying bugs with macOS virtualization and I wouldn't recommend the VM as a desktop replacement. For example, the mouse cursor jumps around when hovering over hyperlinks. Dropdown menus sometimes appear in the bottom left corner. iMovie crashes regularly when importing videos into the timeline. Preview has bugs when using the magnifier. Airplay audio has synchronization bugs with video. The volume control in the menubar keeps glitching. With all this said, however, it is extremely useful as a server, so I recommend the following tutorial to those who want it simply as a VM.
 
-Preface: I wanted to run macOS on my workstation, since macOS is a more friendly OS than Linux. However, I still needed to run a Linux Server, mainly to manage my ZFS harddrive array. Virtualizing Linux on a macOS host, and then passing the VM the harddisks may potentially wreak havoc on the ZFS array. I ended up having to use Linux as the host. Thankfully, this also means we don't have to deal with the problems that Hackintosh users must endure.
-
 Virtualization technology has matured a lot in the past few years. The two biggest features are KVM (Kernel-based Virtual Machine) and PCIe-Passthrough. KVM allows near-native usage of the CPU, while PCIe-Passthrough allows *native* usage of the PCI device by the guest. If you passthrough a graphics card, it will even allow you to do gaming, HDMI/DisplayPort audio, etc at full speed. Furthermore, you can even pass through ethernet cards and USB controllers.
 
 ## Prerequisites
@@ -371,13 +369,3 @@ Please star this guide if it is useful!
 https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
 
 https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/
-
-## SKIP, NOT WORKING
-Warning: Recent versions of this file have problems booting macOS ...
-* Download the .rpm file that contains `*ovmf-x64*` from the following page: https://www.kraxel.org/repos/jenkins/edk2/
-* Install `rpm2cpio` and extract the UEFI firmware to your root directory:
-  ```
-  sudo apt install rpm2cpio
-  cd /
-  rpm2cpio /rust/storage/hackintosh/edk2.git-ovmf-x64-0-20171030.b3082.g710d9e69fa.noarch.rpm  | sudo cpio -idmv
-  ```
