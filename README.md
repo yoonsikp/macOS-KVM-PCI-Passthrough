@@ -1,5 +1,5 @@
 # macOS-KVM-PCI-Passthrough
-A guide to macOS virtualization and PCI Passthrough on Ubuntu Server >= 18.04 and Debian >= 10, done completely through the command line. The `libvirt` library is used, which provides clean syntax (no `qemu` flags) and provides features such as autostart. Finally, this guide describes how to attach `vfio_pci` to PCI devices during `initramfs` boot (the earliest hook possible), thus preventing bugs with early GPU initialization.
+A guide to macOS virtualization and PCI Passthrough on Ubuntu Server 18.04+ and Debian 10+, done completely through the command line. The `libvirt` library is used, which provides clean syntax and provides features such as autostart. Finally, unlike other guides, this guide attaches the `vfio_pci` driver to PCI devices at the earliest hook possible (`initramfs`), thus preventing bugs with early GPU initialization.
 
 <p align="center">
   <img src=https://raw.githubusercontent.com/yoonsikp/macOS-KVM-PCI-Passthrough/master/bootup.gif width=60%>
