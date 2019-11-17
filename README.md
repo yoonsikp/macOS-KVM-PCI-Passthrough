@@ -388,6 +388,12 @@ Use ```<input type='mouse' bus='usb'/>``` instead of ```<input type='tablet' bus
 If you ever need to delete your VM:
 Type ```sudo virsh undefine --nvram macos```. Keep in mind if you add it back, you must go through the process of changing the resolution in the UEFI again.
 
+Speed up macOS:
+```
+defaults write NSGlobalDomain NSAppSleepDisabled -bool YES
+sudo sysctl -w kern.timer.coalescing_enabled=0
+```
+
 Please star this guide if it is useful!
 
 ## Resources
