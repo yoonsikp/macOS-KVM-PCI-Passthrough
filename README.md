@@ -72,7 +72,12 @@ Let's begin with the step that requires a Mac.
 
 We need to install qemu (the hypervisor), libvirt (the VM daemon), and virtinst (the VM manager).
 
-If you have Ubuntu Server >= 18.04, then run the following command:
+If you have Ubuntu Server >= 19.10, then run the following:
+  ```
+  sudo apt install qemu-kvm virtinst bridge-utils cpu-checker libvirt-clients
+  ```
+
+If you have Ubuntu Server 18.04 to 19.04, then run the following:
   ```
   sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
   ```
