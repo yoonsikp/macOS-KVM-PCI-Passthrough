@@ -72,18 +72,14 @@ Let's begin with the step that requires a Mac.
 
 We need to install qemu (the hypervisor), libvirt (the VM daemon), and virtinst (the VM manager).
 
-If you have Ubuntu Server >= 19.10, then run the following:
+If you have Ubuntu >= 19.10 or Debian >= 10, then run the following:
   ```
-  sudo apt install qemu-kvm virtinst bridge-utils cpu-checker libvirt-clients
+  sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system virtinst bridge-utils cpu-checker
   ```
 
 If you have Ubuntu Server 18.04 to 19.04, then run the following:
   ```
-  sudo apt-get install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
-  ```
-If you have Debian >= 10, then run the following:
-  ``` 
-  sudo apt-get install qemu-kvm libvirt-clients libvirt-daemon-system virtinst bridge-utils 
+  sudo apt install qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
   ```
 
 ## Enabling Kernel Support for Passthrough
