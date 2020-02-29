@@ -48,7 +48,8 @@
     
     <interface type='network'>
       <source network='default'/>
-      <model type='e1000-82545em'/>
+      <mac address='02:04:1f:7f:ef:da'/>
+      <model type='vmxnet3'/>
     </interface>
     
     <!--
