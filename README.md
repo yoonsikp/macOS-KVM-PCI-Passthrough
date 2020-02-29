@@ -241,13 +241,8 @@ Next we need to install a UEFI implementation for QEMU.
 
 ## Setting Up macOS for the First Time and Networking
 
-Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may break things. Only set up user accounts, time zone, etc. While configuring the network, it may fail (or crash). That is fine. If it crashes, 
+Clover should automatically boot up macOS from now on. While setting up your macOS installation in the initial bootup, definitely do not login to iCloud/iMessage/iAnything yet. Logging in now may break things. Only set up user accounts, time zone, etc. While configuring the network, it may fail (or crash). That is fine. 
 
-Once completed, we can fix the networking. macOS has a bug where it believes that the network cable is unplugged. Run the following set of commands in Ubuntu Server to fix it (on every boot!):
-```
-sudo virsh domif-setlink macos vnet0 down
-sudo virsh domif-setlink macos vnet0 up
-```
 ## Cleaning Up the macOS XML configuration file
 We are almost done.
 
